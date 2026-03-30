@@ -1,0 +1,70 @@
+# EDA工具临时文件
+Temp/
+
+# VCS
+*.log
+*.vpd
+*.fsdb
+*.key
+*.svf
+*.rc
+simv*
+csrc/
+work/
+vc_hdrs.h
+
+# Verdi
+verdiLog/
+novas*
+
+# Spyglass
+.spyglass/
+*.sgprj
+
+# Design Compiler
+*.svf
+*.ddc
+*.sdc
+command.log
+*.pvl
+*.syn
+
+# Innovus/CC2
+*.enc
+*.lef
+*.def
+*.gds
+*.oasis
+*.v
+*.spef
+*.sdf
+*.rpt
+
+# PrimeTime
+*.tim
+
+# Calibre
+*.rul
+*.res
+*.summary
+
+# 编译输出
+*.o
+*.a
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 备份文件
+*.bak
+*.old
+*.orig

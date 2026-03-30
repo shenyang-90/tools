@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+"""
+SoC/IP Project Initialization Script
+根据项目模板初始化新的芯片设计项目
+
+符合 SOC_DESIGN_WORKFLOW.md 定义的三级目录结构:
+- ProjectMgmt/ - 项目管理
+- Database/ - 设计数据和资产
+- Temp/ - EDA工具临时文件 (不提交git)
+"""
+
+import os
+import sys
+import shutil
+from datetime import datetime
+from pathlib import Path
+
+def get_project_info():
+    """获取用户输入的项目信息"""
+    print("=" * 70)
+    print("车规级芯片设计项目初始化工具")
+    print("符合 SOC_DESIGN_WORKFLOW.md 标准目录结构")
+    print("=" * 70)
+    print()
+    
+    # 项目类型
+    while True:
+        project_type = input("项目类型 (SoC/IP): ").strip().upper()
+        if project_type in ["SOC", "IP"]:
+            break
+        print("请输入 SoC 或 IP")
+    
+    # 项目名称
+    while True:
+        project_name = input("项目名称 (例如: AI_Accelerator, USB_Controller): ").strip()
+        if project_name:
+            project_name = "".join(c for c in project_name if c.isalnum() or c == "_")
+            break
+        print("项目名称不能为空")
+    
+    # 项目ID
+    date_str = datetime.now().strftime("%Y%m%d")
+    default_id = f"{project_type}_{date_str}_001"
+    project_id = input(f"项目ID (默认: {default_id}): ").strip()
+    if not project_id:
+        project_id = default_id
+    
+    # 工艺节点
+    process_node = input("工艺节点 (例如: tsmc7nm, tsmc5nm, smic28nm, 默认: tsmc7nm): ").strip()
+    if not process_node:
+        process_node = "tsmc7nm"
+    
+    # ASIL等级
+    while True:
+        asil_level = input("ASIL等级 (ASIL-D/ASIL-B/QM, 默认: ASIL-D): ").strip().upper()
+        if not asil_level:
+            asil_level = "ASIL-D"
+        if asil_level in ["ASIL-D", "ASIL-B", "ASIL-A", "ASIL-C", "QM"]:
+            break
+        print("请输入有效的ASIL等级")
+    
+    # PM
+    pm_name = input("项目经理 (默认: PM Agent): ").strip()
+    if not pm_name:
+        pm_name = "PM Agent"
+    
+    print()
+    return {
+        "project_type": project_type,
+        "project_name": project_name,
+        "project_id": project_id,
+        "process_node": process_node,
+        "asil_level": asil_level,
+        "pm_name": pm_name,
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "year": datetime.now().year
+    }
+
+def create_project_structure(project_info, target_dir):
+    """创建项目目录结构"""
+    template_dir = Path(__file__).parent
+    
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # 复制整个模板结构
+    for item in template_dir.iterdir():
+        if item.name in ["install", ".git"]:
+            continue
+        
+        target_path = Path(target_dir) / item.name
+        if item.is_dir():
+            shutil.copytree(item, target_path, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, target_path)
+    
+    print(f"✓ 复制模板文件到 {target_dir}")
+
+def replace_placeholders(project_info, target_dir):
+    """替换文件中的占位符"""
+    target_path = Path(target_dir)
+    
+    placeholders = {
+        "{{PROJECT_NAME}}": project_info["project_name"],
+        "{{PROJECT_ID}}": project_info["project_id"],
+        "{{PROJECT_TYPE}}": project_info["project_type"],
+        "{{PROCESS_NODE}}": project_info["process_node"],
+        "{{ASIL_LEVEL}}": project_info["asil_level"],
+        "{{PM_NAME}}": project_info["pm_name"],
+        "{{DATE}}": project_info["date"],
+        "{{YEAR}}": str(project_info["year"])
+    }
+    
+    for file_path in target_path.rglob("*"):
+        if file_path.is_file() and file_path.suffix in [".md", ".txt", ".yml", ".yaml", ".json", ".tcl", ".sh", ".sv", ".v", ".c", ".h"]:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                
+                for placeholder, value in placeholders.items():
+                    content = content.replace(placeholder, value)
+                
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+            except Exception as e:
+                pass  # 忽略二进制文件等
+    
+    print(f"✓ 替换占位符完成")
+
+def generate_project_summary(project_info, target_dir):
+    """生成项目摘要"""
+    print()
+    print("=" * 70)
+    print("项目初始化完成!")
+    print("=" * 70)
+    print()
+    print(f"项目名称: {project_info['project_name']}")
+    print(f"项目ID:   {project_info['project_id']}")
+    print(f"项目类型: {project_info['project_type']}")
+    print(f"工艺节点: {project_info['process_node']}")
+    print(f"ASIL等级: {project_info['asil_level']}")
+    print(f"项目经理: {project_info['pm_name']}")
+    print()
+    print(f"项目位置: {target_dir}")
+    print()
+    print("目录结构:")
+    print(f"  {target_dir}/")
+    print(f"  ├── ProjectMgmt/           # 项目管理")
+    print(f"  │   ├── Planning/          # 项目计划")
+    print(f"  │   ├── Reviews/           # 评审记录 (PCD/PAD/EDR/IDR/FDR/PostSilicon)")
+    print(f"  │   ├── Bugs/              # Bug管理 (P1/P2/P3/P4)")
+    print(f"  │   ├── MeetingMinutes/    # 会议记录")
+    print(f"  │   ├── Milestones/        # 阶段交付物")
+    print(f"  │   ├── RiskMgmt/          # 风险管理")
+    print(f"  │   ├── ChangeMgmt/        # 变更管理")
+    print(f"  │   └── StatusReports/     # 状态报告")
+    print(f"  ├── Database/              # 设计数据")
+    print(f"  │   ├── Docs/              # 文档 (Arch/Design/Verification/FuSa/...)")
+    print(f"  │   ├── DesignData/        # RTL/Netlist/GDS")
+    print(f"  │   ├── Verification/      # 验证环境")
+    print(f"  │   ├── Validation/        # FPGA/硅后验证")
+    print(f"  │   ├── Firmware/          # 固件")
+    print(f"  │   ├── Scripts/           # EDA脚本")
+    print(f"  │   ├── Reference/         # 参考资料")
+    print(f"  │   └── ToolConfig/        # 工具配置")
+    print(f"  ├── Temp/                  # EDA临时文件 (不提交git)")
+    print(f"  ├── README.md              # 项目主页")
+    print(f"  └── .gitignore             # Git忽略配置")
+    print()
+    print("下一步:")
+    print(f"  1. cd {target_dir}")
+    print("  2. git init")
+    print("  3. 编辑 ProjectMgmt/Planning/Master_Schedule.md 制定计划")
+    print("  4. 开始 Phase 1 (PCD) 工作")
+    print()
+
+def main():
+    project_info = get_project_info()
+    
+    workspace_dir = Path(__file__).parent.parent
+    target_dir = workspace_dir / project_info["project_name"]
+    
+    if target_dir.exists():
+        print(f"\n错误: 目录 {target_dir} 已存在!")
+        response = input("是否覆盖? (y/N): ").strip().lower()
+        if response != "y":
+            print("取消初始化")
+            sys.exit(0)
+        shutil.rmtree(target_dir)
+    
+    print(f"\n正在创建项目: {project_info['project_name']}...")
+    print()
+    
+    create_project_structure(project_info, target_dir)
+    replace_placeholders(project_info, target_dir)
+    
+    generate_project_summary(project_info, target_dir)
+
+if __name__ == "__main__":
+    main()
