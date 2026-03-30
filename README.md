@@ -1,46 +1,37 @@
-# SoC Project Template
+# Tools - SoC Design Workflow Tools
 
-车规级芯片设计项目模板，符合 SOC_DESIGN_WORKFLOW.md 标准目录结构。
+车规级芯片设计工作流工具集。
 
-## 快速开始
+## 工具列表
+
+### 🗂️ project_template
+
+**描述**: SoC/IP 芯片设计项目模板  
+**用途**: 初始化符合 SOC_DESIGN_WORKFLOW.md 标准的新项目  
+**路径**: [`./project_template/`](./project_template/)
 
 ```bash
-# 克隆仓库
-git clone git@github.com:shenyang-90/tools.git
-cd tools/project_template
-
-# 初始化新项目
+cd project_template
 ./install
 ```
 
-## 目录结构
+**功能**:
+- 6个设计阶段完整目录结构 (PCD→PAD→EDR→IDR→FDR→PostSilicon)
+- ProjectMgmt: 计划、评审、Bug、会议、里程碑、风险、变更、报告
+- Database: 文档、RTL/网表/GDS、验证、固件、EDA脚本
+- Temp: EDA临时文件 (已配置 .gitignore)
+- 自动占位符替换 (项目名、工艺节点、ASIL等级等)
 
-```
-project_template/
-├── ProjectMgmt/          # 项目管理
-│   ├── Planning/         # 项目计划
-│   ├── Reviews/          # 评审记录
-│   ├── Bugs/             # Bug管理
-│   └── ...
-├── Database/             # 设计数据
-│   ├── Docs/             # 设计文档
-│   ├── DesignData/       # RTL/Netlist/GDS
-│   ├── Verification/     # 验证环境
-│   └── ...
-└── Temp/                 # EDA临时文件
-```
+**文档**: [project_template/README.md](./project_template/README.md)
 
-## 使用方法
+---
 
-运行 `./install` 后按提示输入：
-- 项目类型 (SoC/IP)
-- 项目名称
-- 工艺节点
-- ASIL等级
-- 项目经理
+## 添加新工具
 
-将自动生成完整的项目结构，并自动替换模板中的占位符。
+1. 在 `tools/` 目录下创建新文件夹
+2. 添加该工具的 `README.md`
+3. 更新本文件，添加工具介绍
 
-## 文档
+## 快速链接
 
 - [SOC_DESIGN_WORKFLOW.md](../../workflow/SOC_DESIGN_WORKFLOW.md) - 设计工作流参考
