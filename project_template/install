@@ -64,6 +64,15 @@ def get_project_info():
     if not pm_name:
         pm_name = "PM Agent"
     
+    # RTL/TB 顶层模块名
+    rtl_top = input(f"RTL顶层模块名 (默认: {project_name}_top): ").strip()
+    if not rtl_top:
+        rtl_top = f"{project_name}_top"
+    
+    tb_top = input(f"Testbench顶层名 (默认: tb_{project_name}): ").strip()
+    if not tb_top:
+        tb_top = f"tb_{project_name}"
+    
     print()
     return {
         "project_type": project_type,
@@ -72,6 +81,8 @@ def get_project_info():
         "process_node": process_node,
         "asil_level": asil_level,
         "pm_name": pm_name,
+        "rtl_top": rtl_top,
+        "tb_top": tb_top,
         "date": datetime.now().strftime("%Y-%m-%d"),
         "year": datetime.now().year
     }
@@ -95,10 +106,28 @@ def create_project_structure(project_info, target_dir):
     
     print(f"✓ 复制模板文件到 {target_dir}")
 
-def replace_placeholders(project_info, target_dir):
+def get_eda_tool_paths():
+    """获取EDA工具路径（支持用户自定义或自动检测）"""
+    print("=" * 70)
+    print("EDA 工具配置")
+    print("=" * 70)
+    print("(留空使用系统默认路径)")
+    print()
+    
+    return {
+        "{{IVERILOG_PATH}}": input("iverilog 路径 (默认: iverilog): ").strip() or "iverilog",
+        "{{VVP_PATH}}": input("vvp 路径 (默认: vvp): ").strip() or "vvp",
+        "{{VERILATOR_PATH}}": input("verilator 路径 (默认: verilator): ").strip() or "verilator",
+        "{{GHDL_PATH}}": input("ghdl 路径 (默认: ghdl): ").strip() or "ghdl",
+        "{{GTKWAVE_PATH}}": input("gtkwave 路径 (默认: gtkwave): ").strip() or "gtkwave",
+        "{{COCOTB_PATH}}": input("cocotb-config 路径 (默认: cocotb-config): ").strip() or "cocotb-config",
+    }
+
+def replace_placeholders(project_info, target_dir, eda_paths=None):
     """替换文件中的占位符"""
     target_path = Path(target_dir)
     
+    # 基础占位符
     placeholders = {
         "{{PROJECT_NAME}}": project_info["project_name"],
         "{{PROJECT_ID}}": project_info["project_id"],
@@ -106,9 +135,15 @@ def replace_placeholders(project_info, target_dir):
         "{{PROCESS_NODE}}": project_info["process_node"],
         "{{ASIL_LEVEL}}": project_info["asil_level"],
         "{{PM_NAME}}": project_info["pm_name"],
+        "{{RTL_TOP}}": project_info["rtl_top"],
+        "{{TB_TOP}}": project_info["tb_top"],
         "{{DATE}}": project_info["date"],
         "{{YEAR}}": str(project_info["year"])
     }
+    
+    # 添加EDA工具路径占位符
+    if eda_paths:
+        placeholders.update(eda_paths)
     
     for file_path in target_path.rglob("*"):
         if file_path.is_file() and file_path.suffix in [".md", ".txt", ".yml", ".yaml", ".json", ".tcl", ".sh", ".sv", ".v", ".c", ".h"]:
@@ -160,21 +195,37 @@ def generate_project_summary(project_info, target_dir):
     print(f"  │   ├── Validation/        # FPGA/硅后验证")
     print(f"  │   ├── Firmware/          # 固件")
     print(f"  │   ├── Scripts/           # EDA脚本")
+    print(f"  │   │   ├── iverilog/      # Icarus Verilog")
+    print(f"  │   │   ├── verilator/     # Verilator")
+    print(f"  │   │   ├── ghdl/          # GHDL")
+    print(f"  │   │   ├── cocotb/        # cocotb Python测试")
+    print(f"  │   │   └── Makefile       # 统一EDA入口")
     print(f"  │   ├── Reference/         # 参考资料")
     print(f"  │   └── ToolConfig/        # 工具配置")
     print(f"  ├── Temp/                  # EDA临时文件 (不提交git)")
     print(f"  ├── README.md              # 项目主页")
     print(f"  └── .gitignore             # Git忽略配置")
     print()
+    print("EDA工具:")
+    print(f"  make iverilog    # 使用 Icarus Verilog 仿真")
+    print(f"  make verilator   # 使用 Verilator 仿真")
+    print(f"  make ghdl        # 使用 GHDL 仿真")
+    print(f"  make cocotb      # 使用 cocotb Python测试")
+    print(f"  make lint        # 运行静态检查")
+    print()
     print("下一步:")
     print(f"  1. cd {target_dir}")
     print("  2. git init")
-    print("  3. 编辑 ProjectMgmt/Planning/Master_Schedule.md 制定计划")
-    print("  4. 开始 Phase 1 (PCD) 工作")
+    print("  3. 编辑 Database/Scripts 下的 EDA 工具配置")
+    print("  4. 编辑 ProjectMgmt/Planning/Master_Schedule.md 制定计划")
+    print("  5. 开始 Phase 1 (PCD) 工作")
     print()
 
 def main():
     project_info = get_project_info()
+    
+    # 获取EDA工具路径配置
+    eda_paths = get_eda_tool_paths()
     
     workspace_dir = Path(__file__).parent.parent
     target_dir = workspace_dir / project_info["project_name"]
@@ -191,7 +242,7 @@ def main():
     print()
     
     create_project_structure(project_info, target_dir)
-    replace_placeholders(project_info, target_dir)
+    replace_placeholders(project_info, target_dir, eda_paths)
     
     generate_project_summary(project_info, target_dir)
 
