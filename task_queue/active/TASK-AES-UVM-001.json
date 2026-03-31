@@ -1,0 +1,63 @@
+{
+  "task_id": "TASK-AES-UVM-001",
+  "from": "PM Agent",
+  "to": "Coding Yang",
+  "created_at": "2026-03-31T09:25:00+08:00",
+  "activated_at": "2026-03-31T09:55:00+08:00",
+  "status": "active",
+  "priority": "high",
+  "type": "uvm_environment",
+  "context": {
+    "agent": "Coding Yang",
+    "workflow_phase": "IDR",
+    "project": "AES_Crypto",
+    "description": "【IDR阶段】搭建UVM验证环境"
+  },
+  "execution": {
+    "command": "Coding Yang 任务：搭建AES IP UVM验证环境",
+    "steps": [
+      "1. 阅读 Verification Plan v1.0",
+      "2. 创建 Database/Verification/uvm/ 目录",
+      "3. 搭建UVM基础环境:",
+      "   - tb_top.sv (顶层Testbench)",
+      "   - aes_env.sv (UVM Environment)",
+      "   - axi4_stream_agent/ (数据流Agent)",
+      "   - apb_agent/ (配置Agent)",
+      "   - aes_scoreboard.sv (参考模型比对)",
+      "   - aes_sequences.sv (Sequence库)",
+      "4. 集成Golden Model (C++/Python)",
+      "5. 编写基础testcases:",
+      "   - smoke_test (冒烟测试)",
+      "   - basic_test (基础功能)",
+      "   - random_test (随机测试)",
+      "6. Git commit & push",
+      "7. 更新任务状态为 completed"
+    ],
+    "key_points": [
+      "必须支持所有6种模式 (ECB/CBC/CTR/GCM/XTS/CTS)",
+      "必须加载NIST测试向量",
+      "必须实现自动结果比对",
+      "覆盖率收集必须可配置",
+      "使用 {{VERILATOR_PATH}} 或 {{VCS_PATH}} 仿真"
+    ]
+  },
+  "requirements": {
+    "deliverables": [
+      "Database/Verification/uvm/tb_top.sv",
+      "Database/Verification/uvm/aes_env.sv",
+      "Database/Verification/uvm/axi4_stream_agent/",
+      "Database/Verification/uvm/apb_agent/",
+      "Database/Verification/uvm/aes_scoreboard.sv",
+      "Database/Verification/uvm/aes_sequences.sv",
+      "Database/Verification/uvm/tests/smoke_test.sv",
+      "Database/Verification/uvm/tests/basic_test.sv",
+      "Database/Verification/uvm/tests/random_test.sv",
+      "Database/Verification/uvm/Makefile"
+    ],
+    "deadline": "2026-04-07",
+    "blocking": "TASK-AES-RTL-001" 
+  },
+  "notify": {
+    "on_complete": true
+  }
+}

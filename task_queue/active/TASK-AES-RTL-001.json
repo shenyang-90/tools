@@ -1,0 +1,69 @@
+{
+  "task_id": "TASK-AES-RTL-001",
+  "from": "PM Agent",
+  "to": "Coding Yang",
+  "created_at": "2026-03-31T09:25:00+08:00",
+  "activated_at": "2026-03-31T09:55:00+08:00",
+  "status": "active",
+  "priority": "critical",
+  "type": "rtl_implementation",
+  "context": {
+    "agent": "Coding Yang",
+    "workflow_phase": "IDR",
+    "project": "AES_Crypto",
+    "description": "【IDR阶段】AES IP RTL开发"
+  },
+  "execution": {
+    "command": "Coding Yang 任务：实现 AES IP RTL (12个模块)",
+    "steps": [
+      "1. 阅读 Design Spec v1.0 了解设计规范",
+      "2. 创建 Database/RTL/ 目录结构",
+      "3. 按优先级实现RTL模块:",
+      "   - aes_controller (主控模块)",
+      "   - aes_core (AES核心)",
+      "   - sbox_masked (TI掩码S-Box)",
+      "   - key_schedule (密钥调度)",
+      "   - key_manager (密钥管理)",
+      "   - mode_controller (模式控制)",
+      "   - cts_handler (CTS处理)",
+      "   - xts_engine (XTS引擎)",
+      "   - fault_detector (故障检测)",
+      "   - crc_checker (CRC校验)",
+      "   - axi4_stream_if (AXI4-Stream接口)",
+      "   - apb_if (APB配置接口)",
+      "4. 运行Lint检查清理代码",
+      "5. Git commit & push",
+      "6. 更新任务状态为 completed"
+    ],
+    "key_points": [
+      "必须实现TI 3-share S-Box (参考TI_SBox_Design.md)",
+      "必须实现CTS 1-127 bit边界处理逻辑",
+      "必须实现双核Lockstep故障检测",
+      "必须实现3级时钟门控",
+      "代码风格必须符合Coding Style Guide",
+      "使用 {{IVERILOG_PATH}} 本地验证"
+    ]
+  },
+  "requirements": {
+    "deliverables": [
+      "Database/RTL/aes_controller.v",
+      "Database/RTL/aes_core.v",
+      "Database/RTL/sbox_masked.v",
+      "Database/RTL/key_schedule.v",
+      "Database/RTL/key_manager.v",
+      "Database/RTL/mode_controller.v",
+      "Database/RTL/cts_handler.v",
+      "Database/RTL/xts_engine.v",
+      "Database/RTL/fault_detector.v",
+      "Database/RTL/crc_checker.v",
+      "Database/RTL/axi4_stream_if.v",
+      "Database/RTL/apb_if.v",
+      "Database/RTL/aes_top.v (顶层)"
+    ],
+    "deadline": "2026-04-14",
+    "lint_clean": true
+  },
+  "notify": {
+    "on_complete": true
+  }
+}

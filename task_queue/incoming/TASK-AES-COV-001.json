@@ -1,0 +1,48 @@
+{
+  "task_id": "TASK-AES-COV-001",
+  "from": "PM Agent",
+  "to": "Coding Yang",
+  "created_at": "2026-03-31T09:55:00+08:00",
+  "status": "incoming",
+  "priority": "critical",
+  "type": "coverage",
+  "context": {
+    "agent": "Coding Yang",
+    "workflow_phase": "IDR",
+    "project": "AES_Crypto",
+    "description": "【IDR阶段】覆盖率收敛与回归测试"
+  },
+  "execution": {
+    "command": "Coding Yang 任务：覆盖率收敛至目标并稳定回归",
+    "steps": [
+      "1. 收集代码覆盖率 (Line/Condition/FSM/Toggle)",
+      "2. 收集功能覆盖率 (Covergroup/Cross)",
+      "3. 收集断言覆盖率 (SVA)",
+      "4. 分析覆盖率缺口",
+      "5. 补充Testcase覆盖缺口",
+      "6. 迭代直至达标",
+      "7. 运行回归测试 (连续2周)",
+      "8. Git commit & push",
+      "9. 更新任务状态为 completed"
+    ],
+    "key_points": [
+      "Code Coverage >90%",
+      "Func Coverage >85%",
+      "Assert Coverage >95%",
+      "回归测试连续2周100%通过",
+      "所有P1/P2 Bug必须关闭"
+    ]
+  },
+  "requirements": {
+    "deliverables": [
+      "覆盖率报告 (HTML/txt)",
+      "回归测试报告",
+      "Bug清单 (P1/P2关闭状态)"
+    ],
+    "deadline": "2026-04-21",
+    "blocking": "TASK-AES-TC-001"
+  },
+  "notify": {
+    "on_complete": true
+  }
+}
