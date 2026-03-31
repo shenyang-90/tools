@@ -1,6 +1,14 @@
 # {{PROJECT_NAME}} - Verification Agent 任务清单
 
-> **文档类任务** (由 AI-Yang 执行)
+> **Verification Agent 负责执行**
+
+## 职责范围
+- Verification Plan 编写
+- Testbench 架构设计
+- 测试策略制定
+- 覆盖率计划
+- 参考模型设计
+- 验证环境搭建指导
 
 ## EDR 阶段任务
 
@@ -32,6 +40,34 @@
 | Function Coverage | >85% | VER-{{PROJECT_ID}}-007 |
 | Assertion Coverage | >95% | VER-{{PROJECT_ID}}-008 |
 
+## 交付标准
+
+### Verification Plan 质量要求
+- 验证策略与 Design Spec 对应
+- 测试用例覆盖所有功能点
+- 覆盖率目标明确且可测量
+- 参考模型算法正确
+
+### 评审流程
+```
+Verification Agent 完成文档
+        ↓
+PM Agent 通知 AI Yang
+        ↓
+AI Yang 质量检查
+        ↓
+  ┌─────┴─────┐
+  ▼           ▼
+通过        不通过
+  ↓           ↓
+冻结版本    返回修改
+```
+
+### 与 Design Agent 协作
+- 验证计划必须基于 Design Spec 编写
+- 接口理解不一致时，与 Design Agent 对齐
+- 覆盖率的 Function Point 来自 Design Spec 的功能描述
+
 ---
 *生成时间: {{DATE}}*
-*注意: 文档类任务实际由 AI-Yang 执行，验证执行由 Coding Yang 执行*
+*执行方: Verification Agent*

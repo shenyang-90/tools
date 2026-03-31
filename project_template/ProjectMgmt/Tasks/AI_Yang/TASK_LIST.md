@@ -1,6 +1,6 @@
 # {{PROJECT_NAME}} - AI Yang 任务清单
 
-> **质量守门员** - 所有Gate前的质量检查
+> **质量守门员** - 所有 Gate 前的质量检查 (不直接执行文档编写)
 
 ## 质量检查任务
 
@@ -22,7 +22,25 @@
 | 一致性 | 交付物间无矛盾 | AI-{{PROJECT_ID}}-007 |
 | 可追溯性 | 需求→设计→验证链路完整 | AI-{{PROJECT_ID}}-008 |
 | 质量底线 | 无明显缺陷/错误 | AI-{{PROJECT_ID}}-009 |
-| 规范性 | 符合workflow定义 | AI-{{PROJECT_ID}}-010 |
+| 规范性 | 符合 workflow 定义 | AI-{{PROJECT_ID}}-010 |
+
+## 检查对象
+
+### EDR 阶段检查
+| 交付物 | 编写者 | AI Yang 检查项 |
+|--------|--------|----------------|
+| Design Spec | **Design Agent** | 8章节完整性、寄存器定义、一致性 |
+| Verification Plan | **Verification Agent** | 7章节完整性、覆盖率计划、与Spec对应 |
+| Interface Spec | Design Agent | 接口定义准确性 |
+| CDC/RDC Strategy | Design Agent | 策略合理性 |
+
+### IDR 阶段检查
+| 交付物 | 编写者 | AI Yang 检查项 |
+|--------|--------|----------------|
+| RTL Code | **Coding Yang** | 代码质量、Lint清理、CDC合规 |
+| UVM环境 | Coding Yang | 环境完整性、可运行性 |
+| 覆盖率报告 | Coding Yang | Code>90%, Func>85%, Assert>95% |
+| 测试用例 | Coding Yang | 与 Verification Plan 对应 |
 
 ## 输出模板
 
@@ -45,5 +63,24 @@
 - **实体 Yang 需重点检查**: [列出关键交付物]
 ```
 
+## 工作流程
+
+```
+Design/Verification Agent 完成文档
+              ↓
+      PM Agent 通知 AI Yang
+              ↓
+        AI Yang 质量检查
+              ↓
+        ┌─────┴─────┐
+        ▼           ▼
+      通过        不通过
+        ↓           ↓
+    生成总结    反馈修改意见
+        ↓           ↓
+    提交实体Yang  返回Agent修改
+```
+
 ---
 *生成时间: {{DATE}}*
+*角色: 质量守门员 (不直接编写文档)*

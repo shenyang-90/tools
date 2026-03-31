@@ -14,15 +14,15 @@
 |-------|----------|----------|
 | **PM Agent** | [TASK_LIST](./PM_Agent/TASK_LIST.md) | 项目进度管控、Gate评审组织 |
 | **AI Yang** | [TASK_LIST](./AI_Yang/TASK_LIST.md) | Gate前质量检查、节点状态总结 |
-| **Coding Yang** | [TASK_LIST](./Coding_Yang/TASK_LIST.md) | RTL编码、EDA工具执行、验证 |
+| **Coding Yang** | [TASK_LIST](./Coding_Yang/TASK_LIST.md) | RTL编码、EDA工具执行、验证执行 |
 {{#SOC_TYPE}}
 | **System Architect** | [TASK_LIST](./System_Architect/TASK_LIST.md) | 系统架构设计 (SoC专用) |
 {{/SOC_TYPE}}
 {{#IP_TYPE}}
 | **IP Architect** | [TASK_LIST](./IP_Architect/TASK_LIST.md) | IP架构设计 (IP专用) |
 {{/IP_TYPE}}
-| **Design Agent** | [TASK_LIST](./Design_Agent/TASK_LIST.md) | Design Spec文档 (AI-Yang执行) |
-| **Verification Agent** | [TASK_LIST](./Verification_Agent/TASK_LIST.md) | Verification Plan文档 (AI-Yang执行) |
+| **Design Agent** | [TASK_LIST](./Design_Agent/TASK_LIST.md) | Design Spec、接口规格、设计策略 |
+| **Verification Agent** | [TASK_LIST](./Verification_Agent/TASK_LIST.md) | Verification Plan、测试策略、覆盖率计划 |
 | **DFT Agent** | [TASK_LIST](./DFT_Agent/TASK_LIST.md) | 可测性设计 |
 | **FuSa Engineer** | [TASK_LIST](./FuSa_Engineer/TASK_LIST.md) | 功能安全设计 |
 
@@ -40,8 +40,9 @@
 
 ### Phase 3: EDR (Engineering Document Review)
 - **目标**: 完成设计/验证文档，冻结文档基线
-- **主导**: Design Agent + Verification Agent (AI-Yang执行)
+- **主导**: **Design Agent** + **Verification Agent**
 - **任务**: DESIGN-{{PROJECT_ID}}-*/VER-{{PROJECT_ID}}-*
+- **质量检查**: AI Yang (Gate前)
 
 ### Phase 4: IDR (Implementation Design Review)
 - **目标**: 完成RTL和验证，Code Freeze
@@ -52,6 +53,17 @@
 - **目标**: 完成物理实现，Tapeout
 - **主导**: Physical Agent (SoC) / Coding Yang (IP)
 - **任务**: CODE-{{PROJECT_ID}}-007~010
+
+---
+
+## Agent 分工速查
+
+| 阶段 | 文档编写 | 代码实现 | 质量检查 |
+|------|----------|----------|----------|
+| PAD | System/IP Architect | - | AI Yang |
+| EDR | **Design Agent** + **Verification Agent** | - | AI Yang |
+| IDR | - | Coding Yang | AI Yang |
+| FDR | - | Coding Yang / Physical Agent | AI Yang |
 
 ---
 
@@ -68,4 +80,4 @@
 ---
 
 *生成时间: {{DATE}}*
-*模板版本: v1.0*
+*模板版本: v1.1*

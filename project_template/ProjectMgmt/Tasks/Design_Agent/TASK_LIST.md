@@ -1,6 +1,14 @@
 # {{PROJECT_NAME}} - Design Agent 任务清单
 
-> **文档类任务** (由 AI-Yang 执行)
+> **Design Agent 负责执行**
+
+## 职责范围
+- Design Specification 编写
+- 接口规格定义
+- CDC/RDC 策略制定
+- 低功耗设计策略
+- DFT Specification
+- Floorplan 指南
 
 ## EDR 阶段任务
 
@@ -26,6 +34,29 @@
 | 7 | DESIGN-{{PROJECT_ID}}-001-7 | Low Power | ⚪ 未开始 |
 | 8 | DESIGN-{{PROJECT_ID}}-001-8 | Patent | ⚪ 未开始 |
 
+## 交付标准
+
+### Design Spec 质量要求
+- 所有章节完整，无占位符
+- 寄存器定义精确到 bit 级别
+- 接口时序图清晰
+- 与其他文档交叉引用一致
+
+### 评审流程
+```
+Design Agent 完成文档
+        ↓
+PM Agent 通知 AI Yang
+        ↓
+AI Yang 质量检查
+        ↓
+  ┌─────┴─────┐
+  ▼           ▼
+通过        不通过
+  ↓           ↓
+冻结版本    返回修改
+```
+
 ---
 *生成时间: {{DATE}}*
-*注意: 文档类任务实际由 AI-Yang 执行*
+*执行方: Design Agent*
