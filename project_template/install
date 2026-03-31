@@ -87,6 +87,78 @@ def get_project_info():
         "year": datetime.now().year
     }
 
+def generate_agent_tasks(project_info, target_dir):
+    """根据项目类型生成各Agent的任务清单"""
+    project_type = project_info["project_type"]
+    project_id = project_info["project_id"]
+    date = project_info["date"]
+    
+    tasks_dir = Path(target_dir) / "ProjectMgmt" / "Tasks"
+    
+    # 根据项目类型确定启用的Agent
+    if project_type == "SOC":
+        # SoC项目: 启用System Architect, 禁用IP Architect
+        (tasks_dir / "IP_Architect").rename(tasks_dir / "IP_Architect.disabled")
+        (tasks_dir / "System_Architect" / "TASK_LIST.md").write_text(
+            (tasks_dir / "System_Architect" / "TASK_LIST.md").read_text()
+            .replace("{{PROJECT_NAME}}", project_info["project_name"])
+            .replace("{{PROJECT_ID}}", project_id)
+            .replace("{{PROJECT_TYPE}}", project_type)
+            .replace("{{DATE}}", date)
+        )
+    else:  # IP项目
+        # IP项目: 启用IP Architect, 禁用System Architect
+        (tasks_dir / "System_Architect").rename(tasks_dir / "System_Architect.disabled")
+        (tasks_dir / "IP_Architect" / "TASK_LIST.md").write_text(
+            (tasks_dir / "IP_Architect" / "TASK_LIST.md").read_text()
+            .replace("{{PROJECT_NAME}}", project_info["project_name"])
+            .replace("{{PROJECT_ID}}", project_id)
+            .replace("{{PROJECT_TYPE}}", project_type)
+            .replace("{{DATE}}", date)
+        )
+    
+    # 替换所有Agent的任务清单中的占位符
+    agent_dirs = [
+        "PM_Agent", "AI_Yang", "Coding_Yang",
+        "Design_Agent", "Verification_Agent",
+        "DFT_Agent", "FuSa_Engineer"
+    ]
+    
+    for agent in agent_dirs:
+        task_file = tasks_dir / agent / "TASK_LIST.md"
+        if task_file.exists():
+            content = task_file.read_text()
+            content = content.replace("{{PROJECT_NAME}}", project_info["project_name"])
+            content = content.replace("{{PROJECT_ID}}", project_id)
+            content = content.replace("{{PROJECT_TYPE}}", project_type)
+            content = content.replace("{{DATE}}", date)
+            task_file.write_text(content)
+    
+    # 生成全局任务索引
+    readme_file = tasks_dir / "README.md"
+    if readme_file.exists():
+        content = readme_file.read_text()
+        content = content.replace("{{PROJECT_NAME}}", project_info["project_name"])
+        content = content.replace("{{PROJECT_ID}}", project_id)
+        content = content.replace("{{PROJECT_TYPE}}", project_type)
+        content = content.replace("{{DATE}}", date)
+        
+        # 根据项目类型显示/隐藏对应的Architect
+        if project_type == "SOC":
+            content = content.replace("{{#SOC_TYPE}}", "")
+            content = content.replace("{{/SOC_TYPE}}", "")
+            content = content.replace("{{#IP_TYPE}}", "<!-- ")
+            content = content.replace("{{/IP_TYPE}}", " -->")
+        else:  # IP
+            content = content.replace("{{#SOC_TYPE}}", "<!-- ")
+            content = content.replace("{{/SOC_TYPE}}", " -->")
+            content = content.replace("{{#IP_TYPE}}", "")
+            content = content.replace("{{/IP_TYPE}}", "")
+        
+        readme_file.write_text(content)
+    
+    print(f"✓ 生成Agent任务清单 ({project_type}类型)")
+
 def create_project_structure(project_info, target_dir):
     """创建项目目录结构"""
     template_dir = Path(__file__).parent
@@ -105,6 +177,9 @@ def create_project_structure(project_info, target_dir):
             shutil.copy2(item, target_path)
     
     print(f"✓ 复制模板文件到 {target_dir}")
+    
+    # 根据项目类型生成Agent任务
+    generate_agent_tasks(project_info, target_dir)
 
 def get_eda_tool_paths():
     """获取EDA工具路径（支持用户自定义或自动检测）"""
@@ -181,6 +256,16 @@ def generate_project_summary(project_info, target_dir):
     print(f"  {target_dir}/")
     print(f"  ├── ProjectMgmt/           # 项目管理")
     print(f"  │   ├── Planning/          # 项目计划")
+    print(f"  │   ├── Tasks/             # 各Agent任务清单")
+    print(f"  │   │   ├── PM_Agent/      # PM任务")
+    print(f"  │   │   ├── AI_Yang/       # 质量检查任务")
+    print(f"  │   │   ├── Coding_Yang/   # RTL/验证任务")
+    print(f"  │   │   ├── System_Arch/   # 架构任务 (SoC)")
+    print(f"  │   │   ├── IP_Arch/       # 架构任务 (IP)")
+    print(f"  │   │   ├── Design_Agent/  # 设计文档任务")
+    print(f"  │   │   ├── Ver_Agent/     # 验证文档任务")
+    print(f"  │   │   ├── DFT_Agent/     # DFT任务")
+    print(f"  │   │   └── FuSa_Eng/      # 功能安全任务")
     print(f"  │   ├── Reviews/           # 评审记录 (PCD/PAD/EDR/IDR/FDR/PostSilicon)")
     print(f"  │   ├── Bugs/              # Bug管理 (P1/P2/P3/P4)")
     print(f"  │   ├── MeetingMinutes/    # 会议记录")
@@ -216,9 +301,11 @@ def generate_project_summary(project_info, target_dir):
     print("下一步:")
     print(f"  1. cd {target_dir}")
     print("  2. git init")
-    print("  3. 编辑 Database/Scripts 下的 EDA 工具配置")
-    print("  4. 编辑 ProjectMgmt/Planning/Master_Schedule.md 制定计划")
-    print("  5. 开始 Phase 1 (PCD) 工作")
+    print("  3. 查看 ProjectMgmt/Tasks/README.md - 全局任务索引")
+    print("  4. 查看各Agent任务清单 ProjectMgmt/Tasks/*/TASK_LIST.md")
+    print("  5. 编辑 Database/Scripts 下的 EDA 工具配置")
+    print("  6. 编辑 ProjectMgmt/Planning/Master_Schedule.md 制定计划")
+    print("  7. 开始 Phase 1 (PCD) 工作")
     print()
 
 def main():
