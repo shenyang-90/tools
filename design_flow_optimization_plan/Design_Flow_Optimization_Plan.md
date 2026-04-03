@@ -168,114 +168,92 @@ project/
 │
 ├── Docs/                     # 文档
 │   ├── Arch/                 # 架构文档
-│   │   ├── Architecture_Specification.md     # [TEMPLATE]
-│   │   ├── System_Architecture.md
-│   │   ├── SoC_Architecture.md
-│   │   ├── Safety_Concept.md
-│   │   ├── Security_Architecture.md
-│   │   └── History.md        # 版本变更记录
+│   │   ├── Architecture_Specification.md     # [TEMPLATE: 含History章节记录版本变更]
+│   │   ├── System_Architecture.md            # [TEMPLATE: 含History章节]
+│   │   ├── SoC_Architecture.md               # [TEMPLATE: 含History章节]
+│   │   ├── Safety_Concept.md                 # [TEMPLATE: 含History章节]
+│   │   └── Security_Architecture.md          # [TEMPLATE: 含History章节]
 │   │
 │   ├── Design/               # 设计规格
-│   │   ├── Design_Specification.md           # [TEMPLATE]
+│   │   ├── Design_Specification.md           # [TEMPLATE: 含History章节]
 │   │   ├── Interface_Specs/
-│   │   │   ├── AXI4_Interface_Spec.md
-│   │   │   ├── APB_Interface_Spec.md
-│   │   │   └── History.md
+│   │   │   ├── AXI4_Interface_Spec.md        # [TEMPLATE: 含History章节]
+│   │   │   └── APB_Interface_Spec.md         # [TEMPLATE: 含History章节]
 │   │   ├── Module_Specs/
-│   │   │   ├── Module_Template.md            # [TEMPLATE]
-│   │   │   └── History.md
+│   │   │   └── Module_Template.md            # [TEMPLATE: 含History章节]
 │   │   ├── SDC/              # 时序约束 (原ToolConfig内容)
 │   │   │   ├── synthesis.sdc                 # [TEMPLATE]
-│   │   │   ├── pt_analysis.sdc
-│   │   │   └── History.md
+│   │   │   └── pt_analysis.sdc
 │   │   ├── UPF/              # 低功耗意图
-│   │   │   ├── power_intent.upf              # [TEMPLATE]
-│   │   │   └── History.md
-│   │   ├── SGDC/             # SpyGlass配置
-│   │   │   ├── lint.sgdc
-│   │   │   └── cdc.sgdc
-│   │   └── History.md
+│   │   │   └── power_intent.upf              # [TEMPLATE]
+│   │   └── SGDC/             # SpyGlass配置
+│   │       ├── lint.sgdc
+│   │       └── cdc.sgdc
 │   │
 │   ├── Verification/         # 验证计划与报告
-│   │   ├── Verification_Plan.md              # [TEMPLATE]
-│   │   ├── Testplan_Coverage.md
-│   │   ├── Coverage_Report.md
-│   │   └── History.md
+│   │   ├── Verification_Plan.md              # [TEMPLATE: 含History章节]
+│   │   ├── Testplan_Coverage.md              # [TEMPLATE: 含History章节]
+│   │   └── Coverage_Report.md                # [TEMPLATE: 含History章节]
 │   │
 │   ├── FuSa/                 # 功能安全文档
-│   │   ├── FMEDA_Report.md
-│   │   ├── Safety_Concept.md
-│   │   ├── Safety_Mechanism_Signals.md
-│   │   └── History.md
+│   │   ├── FMEDA_Report.md                   # [TEMPLATE: 含History章节]
+│   │   ├── Safety_Concept.md                 # [TEMPLATE: 含History章节]
+│   │   └── Safety_Mechanism_Signals.md       # [TEMPLATE: 含History章节]
 │   │
 │   ├── DFT/                  # DFT规格
-│   │   ├── DFT_Specification.md
-│   │   ├── Scan_Plan.md
-│   │   └── History.md
+│   │   ├── DFT_Specification.md              # [TEMPLATE: 含History章节]
+│   │   └── Scan_Plan.md                      # [TEMPLATE: 含History章节]
 │   │
 │   ├── Physical/             # 物理设计文档
-│   │   ├── Floorplan_Guideline.md
-│   │   ├── Power_Plan.md
-│   │   └── History.md
+│   │   ├── Floorplan_Guideline.md            # [TEMPLATE: 含History章节]
+│   │   └── Power_Plan.md                     # [TEMPLATE: 含History章节]
 │   │
 │   └── Firmware/             # 固件文档
-│       ├── Firmware_Spec.md
-│       └── History.md
+│       └── Firmware_Spec.md                  # [TEMPLATE: 含History章节]
 │
 ├── Design/                   # 设计数据 (原DesignData)
 │   ├── RTL/                  # RTL源码
 │   │   ├── soc/              # SoC层级模块
 │   │   │   ├── top/
-│   │   │   │   ├── soc_top.sv              # [TEMPLATE_WITH_HEADER]
-│   │   │   │   ├── soc_top.f
-│   │   │   │   └── History.md
+│   │   │   │   ├── soc_top.sv              # [TEMPLATE_WITH_HEADER: 版本记录在header中]
+│   │   │   │   └── soc_top.f
 │   │   │   ├── bus/
 │   │   │   │   ├── bus_matrix.sv
-│   │   │   │   ├── bus_matrix.f
-│   │   │   │   └── History.md
+│   │   │   │   └── bus_matrix.f
 │   │   │   ├── system/
 │   │   │   │   ├── system_ctrl.sv
-│   │   │   │   ├── system_ctrl.f
-│   │   │   │   └── History.md
+│   │   │   │   └── system_ctrl.f
 │   │   │   ├── safety/
 │   │   │   │   ├── safety_monitor.sv
-│   │   │   │   ├── safety_monitor.f
-│   │   │   │   └── History.md
+│   │   │   │   └── safety_monitor.f
 │   │   │   ├── memory/
 │   │   │   │   ├── mem_ctrl.sv
-│   │   │   │   ├── mem_ctrl.f
-│   │   │   │   └── History.md
+│   │   │   │   └── mem_ctrl.f
 │   │   │   ├── otp/
 │   │   │   │   ├── otp_ctrl.sv
-│   │   │   │   ├── otp_ctrl.f
-│   │   │   │   └── History.md
+│   │   │   │   └── otp_ctrl.f
 │   │   │   ├── clkrst/
 │   │   │   │   ├── clk_rst_ctrl.sv
-│   │   │   │   ├── clk_rst_ctrl.f
-│   │   │   │   └── History.md
+│   │   │   │   └── clk_rst_ctrl.f
 │   │   │   └── iomux/
 │   │   │       ├── io_mux.sv
-│   │   │       ├── io_mux.f
-│   │   │       └── History.md
+│   │   │       └── io_mux.f
 │   │   │
 │   │   └── ip/               # IP层级模块
 │   │       ├── uart/
-│   │       │   ├── uart_top.sv             # [TEMPLATE_WITH_HEADER]
+│   │       │   ├── uart_top.sv             # [TEMPLATE_WITH_HEADER: 版本记录在header中]
 │   │       │   ├── uart_tx.sv
 │   │       │   ├── uart_rx.sv
 │   │       │   ├── uart_regs.sv
-│   │       │   ├── uart.f
-│   │       │   └── History.md
+│   │       │   └── uart.f
 │   │       ├── spi/
 │   │       │   ├── spi_top.sv
 │   │       │   ├── spi_master.sv
 │   │       │   ├── spi_slave.sv
-│   │       │   ├── spi.f
-│   │       │   └── History.md
+│   │       │   └── spi.f
 │   │       └── i2c/          # 其他IP实例
 │   │           ├── i2c_top.sv
-│   │           ├── i2c.f
-│   │           └── History.md
+│   │           └── i2c.f
 │   │
 │   ├── Netlist/              # 综合后网表
 │   │   ├── synth/
