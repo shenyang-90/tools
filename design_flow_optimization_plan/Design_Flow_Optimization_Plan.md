@@ -134,111 +134,110 @@ project/
 │   ├── ChangeMgmt/           # 变更管理
 │   └── StatusReports/        # 状态报告
 │
-├── Database/                 # 设计数据与资产
-│   ├── Docs/                 # 文档
-│   │   ├── Arch/             # 架构文档
-│   │   ├── Design/           # 设计规格
-│   │   │   ├── Interface_Specs/   # 接口规格
-│   │   │   └── Module_Specs/      # 模块规格
-│   │   ├── Verification/     # 验证计划与报告
-│   │   ├── FuSa/             # 功能安全文档
-│   │   │   ├── FMEDA_Report.md
-│   │   │   ├── Safety_Concept.md
-│   │   │   └── Safety_Mechanism_Signals.md
-│   │   ├── DFT/              # DFT规格
-│   │   ├── Physical/         # 物理设计文档
-│   │   └── Firmware/         # 固件文档
-│   │
-│   ├── DesignData/           # 设计数据
-│   │   ├── RTL/              # RTL源码 (.v/.sv)
-│   │   │   ├── top/          # 顶层模块
-│   │   │   ├── core/         # 核心模块
-│   │   │   ├── interface/    # 接口模块
-│   │   │   └── safety/       # 安全机制模块
-│   │   ├── Netlist/          # 综合后网表
-│   │   │   ├── synth/        # 综合网表
-│   │   │   ├── dft/          # DFT插入后网表
-│   │   │   └── pr/           # PR后网表
-│   │   ├── GDS/              # 版图数据
-│   │   ├── SDC/              # 时序约束
-│   │   ├── UPF/              # 低功耗意图
-│   │   └── Constraints/      # 其他约束文件
-│   │
-│   ├── Verification/         # 验证环境
-│   │   ├── Env/              # 验证环境
-│   │   │   ├── uvm/          # UVM环境
-│   │   │   ├── tb/           # Testbench
-│   │   │   ├── sva/          # 断言
-│   │   │   └── tvla/         # 侧信道测试
-│   │   ├── Testcases/        # 测试用例
-│   │   │   ├── directed/     # 定向测试
-│   │   │   ├── random/       # 随机测试
-│   │   │   └── vectors/      # 测试向量
-│   │   ├── Regression/       # 回归测试配置
-│   │   └── Coverage/         # 覆盖率数据
-│   │
-│   ├── Validation/           # 硅前/硅后验证
-│   │   ├── FPGA/             # FPGA验证
-│   │   ├── ATE/              # ATE测试程序
-│   │   └── PostSilicon/      # 硅后验证
-│   │
-│   ├── Firmware/             # 固件
-│   │   ├── BootROM/          # BootROM代码
-│   │   ├── Drivers/          # 驱动程序
-│   │   ├── HAL_BSP/          # HAL/BSP
-│   │   └── TestPrograms/     # 测试程序
-│   │
-│   ├── Scripts/              # EDA工具脚本 [优化重点]
-│   │   ├── Makefile          # 统一入口
-│   │   ├── flow.py           # 流程控制脚本
-│   │   ├── config.mk         # 工具链配置
-│   │   ├── common/           # 公共脚本库
-│   │   │   ├── utils.tcl
-│   │   │   ├── report_parser.py
-│   │   │   └── metrics_collect.sh
-│   │   ├── rtl/              # RTL仿真脚本
-│   │   │   ├── iverilog.mk
-│   │   │   ├── verilator.mk
-│   │   │   ├── vcs.mk
-│   │   │   └── xrun.mk
-│   │   ├── lint/             # Lint检查脚本
-│   │   │   ├── spyglass.mk
-│   │   │   ├── verilator_lint.mk
-│   │   │   └── ascent.mk
-│   │   ├── synth/            # 逻辑综合脚本
-│   │   │   ├── dc_shell.mk
-│   │   │   ├── genus.mk
-│   │   │   └── yosys.mk
-│   │   ├── dft/              # DFT脚本
-│   │   │   ├── tessent.mk
-│   │   │   ├── modus.mk
-│   │   │   └── dftadvisor.mk
-│   │   ├── pr/               # 物理设计脚本
-│   │   │   ├── innovus.mk
-│   │   │   ├── icc2.mk
-│   │   │   └── openroad.mk
-│   │   ├── sta/              # 时序分析脚本
-│   │   │   ├── pt_shell.mk
-│   │   │   ├── tempus.mk
-│   │   │   └── opensta.mk
-│   │   ├── lec/              # 形式验证脚本
-│   │   │   ├── conformal.mk
-│   │   │   └── formality.mk
-│   │   └── signoff/          # Signoff脚本
-│   │       ├── calibre.mk
-│   │       ├── pegasus.mk
-│   │       └── klayout.mk
-│   │
-│   ├── ToolConfig/           # 工具配置文件
-│   │   ├── synthesis.sdc
-│   │   ├── upf.upf
-│   │   ├── spyglass.sgdc
-│   │   └── fpga.xdc
-│   │
-│   └── Reference/            # 参考资料
-│       ├── NIST_Standards/
-│       ├── Datasheets/
-│       └── AppNotes/
+├── Docs/                     # 文档
+│   ├── Arch/                 # 架构文档
+│   ├── Design/               # 设计规格
+│   │   ├── Interface_Specs/       # 接口规格
+│   │   └── Module_Specs/          # 模块规格
+│   ├── Verification/         # 验证计划与报告
+│   ├── FuSa/                 # 功能安全文档
+│   │   ├── FMEDA_Report.md
+│   │   ├── Safety_Concept.md
+│   │   └── Safety_Mechanism_Signals.md
+│   ├── DFT/                  # DFT规格
+│   ├── Physical/             # 物理设计文档
+│   └── Firmware/             # 固件文档
+│
+├── DesignData/               # 设计数据
+│   ├── RTL/                  # RTL源码 (.v/.sv)
+│   │   ├── top/              # 顶层模块
+│   │   ├── core/             # 核心模块
+│   │   ├── interface/        # 接口模块
+│   │   └── safety/           # 安全机制模块
+│   ├── Netlist/              # 综合后网表
+│   │   ├── synth/            # 综合网表
+│   │   ├── dft/              # DFT插入后网表
+│   │   └── pr/               # PR后网表
+│   ├── GDS/                  # 版图数据
+│   ├── SDC/                  # 时序约束
+│   ├── UPF/                  # 低功耗意图
+│   └── Constraints/          # 其他约束文件
+│
+├── Verification/             # 验证环境
+│   ├── Env/                  # 验证环境
+│   │   ├── uvm/              # UVM环境
+│   │   ├── tb/               # Testbench
+│   │   ├── sva/              # 断言
+│   │   └── tvla/             # 侧信道测试
+│   ├── Testcases/            # 测试用例
+│   │   ├── directed/         # 定向测试
+│   │   ├── random/           # 随机测试
+│   │   └── vectors/          # 测试向量
+│   ├── Regression/           # 回归测试配置
+│   └── Coverage/             # 覆盖率数据
+│
+├── Validation/               # 硅前/硅后验证
+│   ├── FPGA/                 # FPGA验证
+│   ├── ATE/                  # ATE测试程序
+│   └── PostSilicon/          # 硅后验证
+│
+├── Firmware/                 # 固件
+│   ├── BootROM/              # BootROM代码
+│   ├── Drivers/              # 驱动程序
+│   ├── HAL_BSP/              # HAL/BSP
+│   └── TestPrograms/         # 测试程序
+│
+├── Scripts/                  # EDA工具脚本 [优化重点]
+│   ├── Makefile              # 统一入口
+│   ├── flow.py               # 流程控制脚本
+│   ├── config.mk             # 工具链配置
+│   ├── common/               # 公共脚本库
+│   │   ├── utils.tcl
+│   │   ├── report_parser.py
+│   │   └── metrics_collect.sh
+│   ├── rtl/                  # RTL仿真脚本
+│   │   ├── iverilog.mk
+│   │   ├── verilator.mk
+│   │   ├── vcs.mk
+│   │   └── xrun.mk
+│   ├── lint/                 # Lint检查脚本
+│   │   ├── spyglass.mk
+│   │   ├── verilator_lint.mk
+│   │   └── ascent.mk
+│   ├── synth/                # 逻辑综合脚本
+│   │   ├── dc_shell.mk
+│   │   ├── genus.mk
+│   │   └── yosys.mk
+│   ├── dft/                  # DFT脚本
+│   │   ├── tessent.mk
+│   │   ├── modus.mk
+│   │   └── dftadvisor.mk
+│   ├── pr/                   # 物理设计脚本
+│   │   ├── innovus.mk
+│   │   ├── icc2.mk
+│   │   └── openroad.mk
+│   ├── sta/                  # 时序分析脚本
+│   │   ├── pt_shell.mk
+│   │   ├── tempus.mk
+│   │   └── opensta.mk
+│   ├── lec/                  # 形式验证脚本
+│   │   ├── conformal.mk
+│   │   └── formality.mk
+│   └── signoff/              # Signoff脚本
+│       ├── calibre.mk
+│       ├── pegasus.mk
+│       └── klayout.mk
+│
+├── ToolConfig/               # 工具配置文件
+│   ├── synthesis.sdc
+│   ├── upf.upf
+│   ├── spyglass.sgdc
+│   └── fpga.xdc
+│
+├── Reference/                # 参考资料
+│   ├── NIST_Standards/
+│   ├── Datasheets/
+│   └── AppNotes/
 │
 └── Temp/                     # EDA工具临时文件（不提交git）
     ├── VCS/                  # VCS仿真中间文件
@@ -260,7 +259,7 @@ project/
 ### 4.1 统一Makefile入口
 
 ```makefile
-# Database/Scripts/Makefile - 统一EDA入口
+# Scripts/Makefile - 统一EDA入口
 
 #==============================================================================
 # 项目配置
@@ -391,7 +390,7 @@ clean:
 ### 4.2 工具链配置 (config.mk)
 
 ```makefile
-# Database/Scripts/config.mk - 工具链配置
+# Scripts/config.mk - 工具链配置
 
 #==============================================================================
 # 工具路径 (可自定义)
@@ -729,12 +728,12 @@ agents:
   
   "deliverables": {
     "rtl_files": [
-      "Database/DesignData/RTL/aes_core.v",
-      "Database/DesignData/RTL/sbox_masked.v",
-      "Database/DesignData/RTL/key_schedule.v"
+      "DesignData/RTL/aes_core.v",
+      "DesignData/RTL/sbox_masked.v",
+      "DesignData/RTL/key_schedule.v"
     ],
     "testcases": [
-      "Database/Verification/Testcases/directed/tc_aes_core_direct.sv"
+      "Verification/Testcases/directed/tc_aes_core_direct.sv"
     ],
     "reports": [
       "ProjectMgmt/Tasks/Coding_Yang/TASK-AES-RTL-001_report.md"
@@ -1281,24 +1280,24 @@ class AutoReviewer:
             MarkdownLintCheck(),
         ],
         "PAD": [
-            FileExistsCheck("Database/Docs/Arch/Architecture_Spec.md"),
-            FileExistsCheck("Database/Docs/FuSa/Safety_Concept.md"),
+            FileExistsCheck("Docs/Arch/Architecture_Spec.md"),
+            FileExistsCheck("Docs/FuSa/Safety_Concept.md"),
             StructureCheck(min_sections=8),
             TraceabilityCheck(),
         ],
         "EDR": [
-            FileExistsCheck("Database/Docs/Design/Design_Specification.md"),
-            FileExistsCheck("Database/Docs/Verification/Verification_Plan.md"),
+            FileExistsCheck("Docs/Design/Design_Specification.md"),
+            FileExistsCheck("Docs/Verification/Verification_Plan.md"),
             SectionCheck(required=["Overview", "Functions", "Registers", "Block Design"]),
         ],
         "IDR": [
-            FileExistsCheck("Database/DesignData/RTL/"),
+            FileExistsCheck("DesignData/RTL/"),
             CoverageCheck(min_line=90, min_toggle=85),
             LintCheck(warnings_max=0),
             BugCheck(no_critical_major=True),
         ],
         "FDR": [
-            FileExistsCheck("Database/DesignData/GDS/"),
+            FileExistsCheck("DesignData/GDS/"),
             TimingCheck(setup_slack_min=0, hold_slack_min=0),
             PVCheck(drc_clean=True, lvs_clean=True),
         ]
