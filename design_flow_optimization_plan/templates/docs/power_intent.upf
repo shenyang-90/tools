@@ -1,0 +1,227 @@
+#===============================================================================
+# power_intent.upf - Unified Power Format
+# Project: [Project Name]
+# Module: Top Level
+# Version: v0.1.0
+# Date: 2026-04-03
+#===============================================================================
+
+#===============================================================================
+# Power Supply Network
+#===============================================================================
+
+# Define power supply ports
+create_supply_port VDD -domain [find top_design]
+create_supply_port VSS -domain [find top_design]
+create_supply_port VDD_PERI -domain [find top_design]
+
+# Create supply nets
+create_supply_net VDD_NET -domain [find top_design]
+create_supply_net VSS_NET -domain [find top_design]
+create_supply_net VDD_PERI_NET -domain [find top_design]
+
+# Connect supply ports to supply nets
+connect_supply_net VDD_NET -ports VDD
+connect_supply_net VSS_NET -ports VSS
+connect_supply_net VDD_PERI_NET -ports VDD_PERI
+
+#===============================================================================
+# Power Domains
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+# PD_CORE - Core Logic Power Domain
+#-------------------------------------------------------------------------------
+create_power_domain PD_CORE \
+    -elements {u_cpu u_bus_matrix} \
+    -scope [find top_design]
+
+# Primary power supply for PD_CORE
+#create_supply_net VDD_CORE -domain PD_CORE
+#connect_supply_net VDD_CORE -ports {VDD}
+set_domain_supply_net PD_CORE \
+    -primary_power_net VDD_NET \
+    -primary_ground_net VSS_NET
+
+#-------------------------------------------------------------------------------
+# PD_PERI - Peripheral Power Domain
+#-------------------------------------------------------------------------------
+create_power_domain PD_PERI \
+    -elements {u_uart u_spi u_i2c u_iomux} \
+    -scope [find top_design]
+
+# Primary power supply for PD_PERI
+set_domain_supply_net PD_PERI \
+    -primary_power_net VDD_PERI_NET \
+    -primary_ground_net VSS_NET
+
+#-------------------------------------------------------------------------------
+# PD_SRAM - SRAM Power Domain (always-on)
+#-------------------------------------------------------------------------------
+create_power_domain PD_SRAM \
+    -elements {u_sram*} \
+    -scope [find top_design]
+
+set_domain_supply_net PD_SRAM \
+    -primary_power_net VDD_NET \
+    -primary_ground_net VSS_NET
+
+#-------------------------------------------------------------------------------
+# PD_SAFETY - Safety Logic Power Domain (always-on)
+#-------------------------------------------------------------------------------
+create_power_domain PD_SAFETY \
+    -elements {u_safety u_clk_rst} \
+    -scope [find top_design]
+
+set_domain_supply_net PD_SAFETY \
+    -primary_power_net VDD_NET \
+    -primary_ground_net VSS_NET
+
+#===============================================================================
+# Power State Definitions
+#===============================================================================
+
+# Define power states for supply nets
+add_power_state VDD_NET -supply \
+    -state {ON  -supply_expr {power == 0.8}} \
+    -state {OFF -supply_expr {power == 0.0}}
+
+add_power_state VDD_PERI_NET -supply \
+    -state {ON  -supply_expr {power == 1.8}} \
+    -state {OFF -supply_expr {power == 0.0}}
+
+add_power_state VSS_NET -supply \
+    -state {ON  -supply_expr {ground == 0.0}}
+
+#-------------------------------------------------------------------------------
+# System Power States
+#-------------------------------------------------------------------------------
+
+# ACTIVE - Full power mode
+create_power_state_group system_states
+add_power_state system_states \
+    -state ACTIVE {
+        VDD_NET      { ON }
+        VDD_PERI_NET { ON }
+    }
+
+# STANDBY - Core off, peripherals on
+add_power_state system_states \
+    -state STANDBY {
+        VDD_NET      { OFF }
+        VDD_PERI_NET { ON }
+    }
+
+# SLEEP - Minimal power, safety logic only
+add_power_state system_states \
+    -state SLEEP {
+        VDD_NET      { OFF }
+        VDD_PERI_NET { OFF }
+    }
+
+#===============================================================================
+# Isolation Strategies
+#===============================================================================
+
+# Isolation for PD_CORE -> PD_PERI when PD_CORE is off
+set_isolation iso_core_to_peri \
+    -domain PD_PERI \
+    -isolation_power_net VDD_PERI_NET \
+    -isolation_ground_net VSS_NET \
+    -clamp_value 0 \
+    -applies_to inputs \
+    -source PD_CORE
+
+set_isolation_control iso_core_to_peri \
+    -domain PD_PERI \
+    -isolation_signal u_clk_rst/pd_core_iso_en \
+    -isolation_sense high
+
+# Isolation for PD_PERI -> PD_CORE when PD_PERI is off
+set_isolation iso_peri_to_core \
+    -domain PD_CORE \
+    -isolation_power_net VDD_NET \
+    -isolation_ground_net VSS_NET \
+    -clamp_value 0 \
+    -applies_to inputs \
+    -source PD_PERI
+
+set_isolation_control iso_peri_to_core \
+    -domain PD_CORE \
+    -isolation_signal u_clk_rst/pd_peri_iso_en \
+    -isolation_sense high
+
+#===============================================================================
+# Retention Strategies
+#===============================================================================
+
+# Retention registers for critical state in PD_CORE
+set_retention retention_core \
+    -domain PD_CORE \
+    -retention_power_net VDD_NET \
+    -retention_ground_net VSS_NET
+
+set_retention_control retention_core \
+    -domain PD_CORE \
+    -save_signal {u_clk_rst/ret_save high} \
+    -restore_signal {u_clk_rst/ret_restore high}
+
+#===============================================================================
+# Level Shifters
+#===============================================================================
+
+# Level shifter for 0.8V -> 1.8V (PD_CORE to PD_PERI)
+set_level_shifter ls_core_to_peri \
+    -domain PD_PERI \
+    -rule low_to_high \
+    -location parent
+
+# Level shifter for 1.8V -> 0.8V (PD_PERI to PD_CORE)
+set_level_shifter ls_peri_to_core \
+    -domain PD_CORE \
+    -rule high_to_low \
+    -location parent
+
+#===============================================================================
+# Power Switches
+#===============================================================================
+
+# Header switch for PD_CORE
+create_power_switch sw_core \
+    -domain PD_CORE \
+    -output_supply_port {vout VDD_NET} \
+    -input_supply_port {vin VDD} \
+    -control_port {ctrl u_clk_rst/pd_core_switch_en} \
+    -on_state {on_state ctrl {TRUE}} \
+    -off_state {off_state {ctrl {FALSE}}}
+
+# Header switch for PD_PERI
+create_power_switch sw_peri \
+    -domain PD_PERI \
+    -output_supply_port {vout VDD_PERI_NET} \
+    -input_supply_port {vin VDD_PERI} \
+    -control_port {ctrl u_clk_rst/pd_peri_switch_en} \
+    -on_state {on_state ctrl {TRUE}} \
+    -off_state {off_state {ctrl {FALSE}}}
+
+#===============================================================================
+# Global Signals
+#===============================================================================
+
+# Always-on signals (e.g., reset)
+#set_related_supply_net -object_list {rst_n} -power VDD_NET -ground VSS_NET
+
+#===============================================================================
+# Boundary Constraints
+#===============================================================================
+
+# Define port attributes
+#set_port_attributes -ports {clk_sys} -attribute {related_power VDD_NET}
+#set_port_attributes -ports {clk_sys} -attribute {related_ground VSS_NET}
+
+#set_port_attributes -ports {uart_*} -attribute {related_power VDD_PERI_NET}
+#set_port_attributes -ports {uart_*} -attribute {related_ground VSS_NET}
+
+#===============================================================================
+# End of File
+#===============================================================================
