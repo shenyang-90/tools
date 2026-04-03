@@ -604,8 +604,8 @@ agents:
     location: cloud
     trigger_keywords: ["验证计划", "testplan"]
 
-  fusa_engineer:
-    name: "FuSa Engineer"
+  fusa_agent:
+    name: "FuSa Agent"
     role: functional_safety
     capabilities: [fmeda, safety_analysis]
     location: cloud
