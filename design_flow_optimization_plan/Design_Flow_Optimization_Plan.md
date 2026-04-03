@@ -105,8 +105,280 @@ project/
 │   │   ├── Milestone_Plan.md
 │   │   ├── Resource_Plan.md
 │   │   └── Task_Assignment.md
-│   ├── Tasks/                # Agent任务清单（按角色分类）
-│   │   ├── AI_Yang/          # 质量检查任务
+│   │
+│   ├── Tasks/                # Agent任务清单（按项目节点分类）
+│   │   ├── PCD/              # Project Concept Definition
+│   │   │   ├── TASK_PCD_001_MRD.md
+│   │   │   ├── TASK_PCD_002_Feasibility.md
+│   │   │   └── CHECKLIST_PCD.md
+│   │   ├── PAD/              # Product Architecture Definition
+│   │   │   ├── TASK_PAD_001_Arch_Spec.md
+│   │   │   ├── TASK_PAD_002_Safety_Concept.md
+│   │   │   ├── TASK_PAD_003_Security_Concept.md
+│   │   │   ├── REVIEW_PAD_Report.md
+│   │   │   └── CHECKLIST_PAD.md
+│   │   ├── EDR/              # Engineering Document Review
+│   │   │   ├── TASK_EDR_001_Design_Spec.md
+│   │   │   ├── TASK_EDR_002_Verification_Plan.md
+│   │   │   ├── TASK_EDR_003_DFT_Spec.md
+│   │   │   ├── TASK_EDR_004_CDC_Strategy.md
+│   │   │   ├── TASK_EDR_005_SDC.md
+│   │   │   ├── TASK_EDR_006_UPF.md
+│   │   │   ├── REVIEW_EDR_Report.md
+│   │   │   └── CHECKLIST_EDR.md
+│   │   ├── IDR/              # Implementation Design Review
+│   │   │   ├── TASK_IDR_001_RTL_Implementation.md
+│   │   │   ├── TASK_IDR_002_UVM_Environment.md
+│   │   │   ├── TASK_IDR_003_Testcase_Development.md
+│   │   │   ├── TASK_IDR_004_Coverage_Collection.md
+│   │   │   ├── REVIEW_IDR_Report.md
+│   │   │   └── CHECKLIST_IDR.md
+│   │   ├── FDR/              # Final Design Review
+│   │   │   ├── TASK_FDR_001_Physical_Design.md
+│   │   │   ├── TASK_FDR_002_STA_Signoff.md
+│   │   │   ├── TASK_FDR_003_DFT_Implementation.md
+│   │   │   ├── TASK_FDR_004_PV_Signoff.md
+│   │   │   ├── REVIEW_FDR_Report.md
+│   │   │   └── CHECKLIST_FDR.md
+│   │   ├── PostSilicon/      # 硅后验证
+│   │   │   ├── TASK_PS_001_ATE_Program.md
+│   │   │   ├── TASK_PS_002_Validation_Report.md
+│   │   │   └── CHECKLIST_PostSilicon.md
+│   │   └── README.md         # 全局任务索引
+│   │
+│   ├── Reviews/              # 评审记录
+│   │   ├── PCD/
+│   │   ├── PAD/
+│   │   ├── EDR/
+│   │   ├── IDR/
+│   │   ├── FDR/
+│   │   └── PostSilicon/
+│   │
+│   ├── Bugs/                 # Bug管理
+│   │   ├── P1_Critical/
+│   │   ├── P2_Major/
+│   │   ├── P3_Minor/
+│   │   └── P4_Trivial/
+│   │
+│   ├── MeetingMinutes/       # 会议记录
+│   ├── Milestones/           # 阶段交付物汇总
+│   ├── RiskMgmt/             # 风险管理
+│   ├── ChangeMgmt/           # 变更管理
+│   └── StatusReports/        # 状态报告
+│
+├── Docs/                     # 文档
+│   ├── Arch/                 # 架构文档
+│   │   ├── Architecture_Specification.md     # [TEMPLATE]
+│   │   ├── System_Architecture.md
+│   │   ├── SoC_Architecture.md
+│   │   ├── Safety_Concept.md
+│   │   ├── Security_Architecture.md
+│   │   └── History.md        # 版本变更记录
+│   │
+│   ├── Design/               # 设计规格
+│   │   ├── Design_Specification.md           # [TEMPLATE]
+│   │   ├── Interface_Specs/
+│   │   │   ├── AXI4_Interface_Spec.md
+│   │   │   ├── APB_Interface_Spec.md
+│   │   │   └── History.md
+│   │   ├── Module_Specs/
+│   │   │   ├── Module_Template.md            # [TEMPLATE]
+│   │   │   └── History.md
+│   │   ├── SDC/              # 时序约束 (原ToolConfig内容)
+│   │   │   ├── synthesis.sdc                 # [TEMPLATE]
+│   │   │   ├── pt_analysis.sdc
+│   │   │   └── History.md
+│   │   ├── UPF/              # 低功耗意图
+│   │   │   ├── power_intent.upf              # [TEMPLATE]
+│   │   │   └── History.md
+│   │   ├── SGDC/             # SpyGlass配置
+│   │   │   ├── lint.sgdc
+│   │   │   └── cdc.sgdc
+│   │   └── History.md
+│   │
+│   ├── Verification/         # 验证计划与报告
+│   │   ├── Verification_Plan.md              # [TEMPLATE]
+│   │   ├── Testplan_Coverage.md
+│   │   ├── Coverage_Report.md
+│   │   └── History.md
+│   │
+│   ├── FuSa/                 # 功能安全文档
+│   │   ├── FMEDA_Report.md
+│   │   ├── Safety_Concept.md
+│   │   ├── Safety_Mechanism_Signals.md
+│   │   └── History.md
+│   │
+│   ├── DFT/                  # DFT规格
+│   │   ├── DFT_Specification.md
+│   │   ├── Scan_Plan.md
+│   │   └── History.md
+│   │
+│   ├── Physical/             # 物理设计文档
+│   │   ├── Floorplan_Guideline.md
+│   │   ├── Power_Plan.md
+│   │   └── History.md
+│   │
+│   └── Firmware/             # 固件文档
+│       ├── Firmware_Spec.md
+│       └── History.md
+│
+├── Design/                   # 设计数据 (原DesignData)
+│   ├── RTL/                  # RTL源码
+│   │   ├── soc/              # SoC层级模块
+│   │   │   ├── top/
+│   │   │   │   ├── soc_top.sv              # [TEMPLATE_WITH_HEADER]
+│   │   │   │   ├── soc_top.f
+│   │   │   │   └── History.md
+│   │   │   ├── bus/
+│   │   │   │   ├── bus_matrix.sv
+│   │   │   │   ├── bus_matrix.f
+│   │   │   │   └── History.md
+│   │   │   ├── system/
+│   │   │   │   ├── system_ctrl.sv
+│   │   │   │   ├── system_ctrl.f
+│   │   │   │   └── History.md
+│   │   │   ├── safety/
+│   │   │   │   ├── safety_monitor.sv
+│   │   │   │   ├── safety_monitor.f
+│   │   │   │   └── History.md
+│   │   │   ├── memory/
+│   │   │   │   ├── mem_ctrl.sv
+│   │   │   │   ├── mem_ctrl.f
+│   │   │   │   └── History.md
+│   │   │   ├── otp/
+│   │   │   │   ├── otp_ctrl.sv
+│   │   │   │   ├── otp_ctrl.f
+│   │   │   │   └── History.md
+│   │   │   ├── clkrst/
+│   │   │   │   ├── clk_rst_ctrl.sv
+│   │   │   │   ├── clk_rst_ctrl.f
+│   │   │   │   └── History.md
+│   │   │   └── iomux/
+│   │   │       ├── io_mux.sv
+│   │   │       ├── io_mux.f
+│   │   │       └── History.md
+│   │   │
+│   │   └── ip/               # IP层级模块
+│   │       ├── uart/
+│   │       │   ├── uart_top.sv             # [TEMPLATE_WITH_HEADER]
+│   │       │   ├── uart_tx.sv
+│   │       │   ├── uart_rx.sv
+│   │       │   ├── uart_regs.sv
+│   │       │   ├── uart.f
+│   │       │   └── History.md
+│   │       ├── spi/
+│   │       │   ├── spi_top.sv
+│   │       │   ├── spi_master.sv
+│   │       │   ├── spi_slave.sv
+│   │       │   ├── spi.f
+│   │       │   └── History.md
+│   │       └── i2c/          # 其他IP实例
+│   │           ├── i2c_top.sv
+│   │           ├── i2c.f
+│   │           └── History.md
+│   │
+│   ├── Netlist/              # 综合后网表
+│   │   ├── synth/
+│   │   ├── dft/
+│   │   └── pr/
+│   │
+│   ├── GDS/                  # 版图数据
+│   └── Constraints/          # 其他约束文件
+│
+├── Verification/             # 验证环境
+│   ├── Env/                  # 验证环境
+│   │   ├── uvm/              # UVM基础环境
+│   │   │   ├── base/
+│   │   │   │   ├── base_test.sv            # [TEMPLATE] v0.1.0
+│   │   │   │   ├── base_sequence.sv
+│   │   │   │   └── base_scoreboard.sv
+│   │   │   ├── agents/
+│   │   │   │   ├── axi4_agent.sv
+│   │   │   │   ├── apb_agent.sv
+│   │   │   │   └── uart_agent.sv
+│   │   │   └── env_top.sv
+│   │   │
+│   │   ├── tb/               # Testbench
+│   │   │   ├── tb_top.sv                   # [TEMPLATE] v0.1.0
+│   │   │   ├── tb_top.f
+│   │   │   ├── clock_gen.sv
+│   │   │   └── reset_gen.sv
+│   │   │
+│   │   ├── sva/              # 断言
+│   │   │   ├── protocol_checkers.sv
+│   │   │   ├── safety_assertions.sv
+│   │   │   └── coverage_assertions.sv
+│   │   │
+│   │   └── tvla/             # 侧信道测试
+│   │       └── tvla_testbench.sv
+│   │
+│   ├── Testcases/            # 测试用例
+│   │   ├── directed/         # 定向测试
+│   │   │   ├── tc_smoke.sv                 # [TEMPLATE] v0.1.0
+│   │   │   ├── tc_rst_reg.sv
+│   │   │   ├── tc_basic_rw.sv
+│   │   │   └── tc_interrupt.sv
+│   │   │
+│   │   ├── random/           # 随机测试
+│   │   │   ├── tc_random_tx.sv
+│   │   │   └── tc_stress.sv
+│   │   │
+│   │   └── vectors/          # 测试向量
+│   │       ├── nist_vectors/
+│   │       ├── directed_patterns/
+│   │       └── golden_ref/
+│   │
+│   ├── Regression/           # 回归测试配置
+│   │   ├── regression_full.cfg
+│   │   ├── regression_smoke.cfg
+│   │   └── regression_nightly.cfg
+│   │
+│   └── Coverage/             # 覆盖率数据
+│       ├── coverage_plan.md
+│       └── coverage_report.md
+│
+├── Validation/               # 硅前/硅后验证
+│   ├── FPGA/
+│   ├── ATE/
+│   └── PostSilicon/
+│
+├── Firmware/                 # 固件
+│   ├── BootROM/
+│   ├── Drivers/
+│   ├── HAL_BSP/
+│   └── TestPrograms/
+│
+├── Scripts/                  # EDA工具脚本
+│   ├── Makefile
+│   ├── flow.py
+│   ├── config.mk
+│   ├── common/
+│   ├── rtl/
+│   ├── lint/
+│   ├── synth/
+│   ├── dft/
+│   ├── pr/
+│   ├── sta/
+│   ├── lec/
+│   └── signoff/
+│
+├── Reference/                # 参考资料
+│   ├── NIST_Standards/
+│   ├── Datasheets/
+│   └── AppNotes/
+│
+└── Temp/                     # EDA工具临时文件（不提交git）
+    ├── VCS/
+    ├── Verilator/
+    ├── Spyglass/
+    ├── DesignCompiler/
+    ├── ICC2/
+    ├── Innovus/
+    ├── PrimeTime/
+    ├── Tessent/
+    ├── Calibre/
+    └── Others/
+```
 │   │   ├── Coding_Yang/      # RTL/验证实现任务
 │   │   ├── Design_Agent/     # 设计文档任务
 │   │   ├── Verification_Agent/ # 验证文档任务
@@ -148,7 +420,7 @@ project/
 │   ├── Physical/             # 物理设计文档
 │   └── Firmware/             # 固件文档
 │
-├── DesignData/               # 设计数据
+├── Design/                   # 设计数据
 │   ├── RTL/                  # RTL源码 (.v/.sv)
 │   │   ├── top/              # 顶层模块
 │   │   ├── core/             # 核心模块
@@ -228,12 +500,6 @@ project/
 │       ├── pegasus.mk
 │       └── klayout.mk
 │
-├── ToolConfig/               # 工具配置文件
-│   ├── synthesis.sdc
-│   ├── upf.upf
-│   ├── spyglass.sgdc
-│   └── fpga.xdc
-│
 ├── Reference/                # 参考资料
 │   ├── NIST_Standards/
 │   ├── Datasheets/
@@ -267,7 +533,7 @@ project/
 PROJECT_NAME    ?= aes_crypto
 RTL_TOP         ?= aes_top
 TB_TOP          ?= tb_aes_top
-RTL_DIR         ?= ../DesignData/RTL
+RTL_DIR         ?= ../Design/RTL
 TB_DIR          ?= ../Verification
 SIMULATOR       ?= iverilog  # iverilog/verilator/vcs/xrun
 SYNTH_TOOL      ?= yosys     # yosys/dc/genus
@@ -451,7 +717,7 @@ OUTPUT_DELAY    ?= 2.0
 
 TEST            ?= tc_smoke
 OUT_DIR         ?= ../../Temp/VCS
-RTL_DIR         ?= ../DesignData/RTL
+RTL_DIR         ?= ../Design/RTL
 TC_DIR          ?= ../Verification/Testcases/directed
 TB_DIR          ?= ../Verification/Env/tb
 
@@ -489,7 +755,7 @@ clean:
 # Database/Scripts/synth/yosys.mk - Yosys综合
 
 OUT_DIR         ?= ../../Temp/Yosys
-RTL_DIR         ?= ../DesignData/RTL
+RTL_DIR         ?= ../Design/RTL
 TOP             ?= $(RTL_TOP)
 
 .PHONY: synth synth_opt clean
@@ -728,9 +994,9 @@ agents:
   
   "deliverables": {
     "rtl_files": [
-      "DesignData/RTL/aes_core.v",
-      "DesignData/RTL/sbox_masked.v",
-      "DesignData/RTL/key_schedule.v"
+      "Design/RTL/aes_core.v",
+      "Design/RTL/sbox_masked.v",
+      "Design/RTL/key_schedule.v"
     ],
     "testcases": [
       "Verification/Testcases/directed/tc_aes_core_direct.sv"
@@ -1291,13 +1557,13 @@ class AutoReviewer:
             SectionCheck(required=["Overview", "Functions", "Registers", "Block Design"]),
         ],
         "IDR": [
-            FileExistsCheck("DesignData/RTL/"),
+            FileExistsCheck("Design/RTL/"),
             CoverageCheck(min_line=90, min_toggle=85),
             LintCheck(warnings_max=0),
             BugCheck(no_critical_major=True),
         ],
         "FDR": [
-            FileExistsCheck("DesignData/GDS/"),
+            FileExistsCheck("Design/GDS/"),
             TimingCheck(setup_slack_min=0, hold_slack_min=0),
             PVCheck(drc_clean=True, lvs_clean=True),
         ]
