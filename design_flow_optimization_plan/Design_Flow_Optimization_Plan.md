@@ -1155,7 +1155,7 @@ dashboard:
       auto_refresh: true
 ```
 
-### 7.2 Dashboard页面 (Markdown格式)
+### 6.2 Dashboard页面 (Markdown格式)
 
 ```markdown
 # AES_Crypto - Project Dashboard
@@ -1244,7 +1244,7 @@ FSM:         █████████████████████░ 
 *Dashboard auto-generated from ProjectMgmt data*
 ```
 
-### 7.3 Dashboard生成脚本
+### 6.3 Dashboard生成脚本
 
 ```python
 #!/usr/bin/env python3
@@ -1514,71 +1514,644 @@ review_stages:
 | 最终批准人 | ☐ | |
 ```
 
-### 8.3 自动化Review检查
+### 7.2 Review Bot 实现
+
+Review Bot 是自动化Review检查引擎，作为任务进入 REVIEWING 状态时的第一道质量关卡。
+
+#### 7.4.1 架构定位
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Review Bot                         │
+│                    (Auto Check Engine)                  │
+├─────────────────────────────────────────────────────────┤
+│  输入: Task状态变更 → REVIEWING                          │
+│  输出: Review Report (PASS / CONDITIONAL / FAIL)        │
+│  触发: 自动执行 + AI Yang复核 + 人工确认                  │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### 7.4.2 核心实现
 
 ```python
 #!/usr/bin/env python3
-# common/auto_review.py - 自动化Review检查
+# Scripts/common/review_bot.py
 
-class AutoReviewer:
-    """自动化Review检查引擎"""
+from pathlib import Path
+from dataclasses import dataclass
+from typing import List, Dict, Optional
+import json
+import subprocess
+from datetime import datetime
+
+@dataclass
+class CheckResult:
+    check_name: str
+    passed: bool
+    message: str
+    details: Optional[Dict] = None
     
-    CHECKS = {
-        "PCD": [
-            FileExistsCheck("ProjectMgmt/Planning/MRD.md"),
-            FileExistsCheck("ProjectMgmt/RiskMgmt/Risk_Assessment.md"),
-            MarkdownLintCheck(),
-        ],
-        "PAD": [
-            FileExistsCheck("Docs/Arch/Architecture_Spec.md"),
-            FileExistsCheck("Docs/FuSa/Safety_Concept.md"),
-            StructureCheck(min_sections=8),
-            TraceabilityCheck(),
-        ],
-        "EDR": [
-            FileExistsCheck("Docs/Design/Design_Specification.md"),
-            FileExistsCheck("Docs/Verification/Verification_Plan.md"),
-            SectionCheck(required=["Overview", "Functions", "Registers", "Block Design"]),
-        ],
-        "IDR": [
-            FileExistsCheck("Design/RTL/"),
-            CoverageCheck(min_line=90, min_toggle=85),
-            LintCheck(warnings_max=0),
-            BugCheck(no_critical_major=True),
-        ],
-        "FDR": [
-            FileExistsCheck("Design/GDS/"),
-            TimingCheck(setup_slack_min=0, hold_slack_min=0),
-            PVCheck(drc_clean=True, lvs_clean=True),
-        ]
-    }
+    def to_dict(self):
+        return {
+            "check": self.check_name,
+            "passed": self.passed,
+            "message": self.message,
+            "details": self.details
+        }
+
+class ReviewBot:
+    """自动化Review检查引擎 - 集成到任务状态机"""
     
-    def review(self, stage, project_path):
-        """执行自动化Review"""
+    # Critical检查项列表，失败将直接导致FAIL
+    CRITICAL_CHECKS = [
+        "FileExists",
+        "CoverageCheck", 
+        "LintErrorCheck",
+        "TimingCheck",
+        "PVCheck"
+    ]
+    
+    def __init__(self, project_path: str):
+        self.project_path = Path(project_path)
+        self.report_path = self.project_path / "ProjectMgmt" / "Reviews"
+        
+    def on_task_reviewing(self, task: Dict) -> Dict:
+        """任务进入REVIEWING状态时自动触发"""
+        stage = self._detect_stage_from_task(task)
+        return self.execute_review(stage, task)
+    
+    def execute_review(self, stage: str, task: Dict) -> Dict:
+        """执行阶段检查"""
+        checks = self._get_checks_for_stage(stage)
         results = []
-        for check in self.CHECKS[stage]:
-            result = check.run(project_path)
+        
+        for check in checks:
+            result = check.run(self.project_path, task)
             results.append(result)
         
-        report = self._generate_report(stage, results)
+        # 生成报告
+        report = self._generate_report(stage, task, results)
+        self._save_report(stage, report)
+        
+        # 自动决策
+        if report["all_passed"]:
+            report["recommendation"] = "PASS"
+        elif report["critical_passed"]:
+            report["recommendation"] = "CONDITIONAL"
+        else:
+            report["recommendation"] = "FAIL"
+            
         return report
     
-    def _generate_report(self, stage, results):
+    def _get_checks_for_stage(self, stage: str) -> List:
+        """每个阶段对应的检查项"""
+        CHECKS = {
+            "PCD": [
+                FileExistsCheck("ProjectMgmt/Planning/MRD.md"),
+                FileExistsCheck("ProjectMgmt/Planning/Feasibility_Study.md"),
+                MarkdownLintCheck(),
+                SectionCheck("ProjectMgmt/Planning/MRD.md", 
+                           required=["Market Analysis", "Technical Feasibility", "Resource Estimation"]),
+            ],
+            "PAD": [
+                FileExistsCheck("Docs/Arch/Architecture_Specification.md"),
+                SectionCheck("Docs/Arch/Architecture_Specification.md", 
+                           required=["Overview", "System Architecture", "Safety Concept", "Security Architecture"]),
+                FileExistsCheck("Docs/FuSa/Safety_Concept.md"),
+                TraceabilityCheck(),
+            ],
+            "EDR": [
+                FileExistsCheck("Docs/Design/Design_Specification.md"),
+                SectionCheck("Docs/Design/Design_Specification.md",
+                           required=["Overview", "Functions", "Registers", "Block Design", "Interface", "History"]),
+                FileExistsCheck("Docs/Verification/Verification_Plan.md"),
+                FileExistsCheck("Docs/Design/SDC/synthesis.sdc"),
+                FileExistsCheck("Docs/Design/UPF/power_intent.upf"),
+                SDCCheck("Docs/Design/SDC/synthesis.sdc"),
+                UPFCheck("Docs/Design/UPF/power_intent.upf"),
+            ],
+            "IDR": [
+                RTLExistenceCheck("Design/RTL/"),
+                FilelistCheck("Design/RTL/soc/top/soc_top.f"),
+                FilelistCheck("Design/RTL/ip/uart/uart.f"),
+                CoverageCheck(min_line=90, min_toggle=85, min_fsm=95),
+                LintCheck(errors_max=0, warnings_max=10),
+                CDCCheck(),
+                BugCheck(no_critical_major=True),
+                FMEDACheck(),
+            ],
+            "FDR": [
+                FileExistsCheck("Design/GDS/top.gds"),
+                TimingCheck(setup_slack_min=0, hold_slack_min=0),
+                PVCheck(drc_clean=True, lvs_clean=True, antenna_clean=True),
+                DFTCoverageCheck(min_coverage=95),
+                PowerAnalysisCheck(),
+            ]
+        }
+        return CHECKS.get(stage, [])
+    
+    def _generate_report(self, stage: str, task: Dict, results: List[CheckResult]) -> Dict:
         """生成Review报告"""
-        passed = sum(1 for r in results if r.passed)
-        total = len(results)
+        passed = [r for r in results if r.passed]
+        failed = [r for r in results if not r.passed]
+        
+        # 分类统计
+        critical_checks = [r for r in failed if any(c in r.check_name for c in self.CRITICAL_CHECKS)]
         
         return {
             "stage": stage,
-            "summary": f"{passed}/{total} checks passed",
-            "passed": passed == total,
-            "details": [r.to_dict() for r in results]
+            "task_id": task.get("id"),
+            "timestamp": datetime.now().isoformat(),
+            "summary": {
+                "total": len(results),
+                "passed": len(passed),
+                "failed": len(failed),
+                "critical_failed": len(critical_checks)
+            },
+            "all_passed": len(failed) == 0,
+            "critical_passed": len(critical_checks) == 0,
+            "results": [r.to_dict() for r in results],
+            "report_file": f"REVIEW_{stage}_Report.md"
         }
+    
+    def _save_report(self, stage: str, report: Dict):
+        """保存报告到 Reviews/ 文件夹"""
+        # 生成Markdown格式报告
+        md_content = self._generate_markdown_report(stage, report)
+        report_md = self.report_path / stage / f"REVIEW_{stage}_Report.md"
+        report_md.write_text(md_content)
+        
+        # 同时保存JSON用于自动化处理
+        json_file = self.report_path / stage / f"REVIEW_{stage}_Report.json"
+        with open(json_file, 'w') as f:
+            json.dump(report, f, indent=2)
+    
+    def _generate_markdown_report(self, stage: str, report: Dict) -> str:
+        """生成Markdown格式Review报告"""
+        lines = [
+            f"# {stage} Review Report",
+            "",
+            f"**Task ID**: {report['task_id']}",
+            f"**Timestamp**: {report['timestamp']}",
+            f"**Recommendation**: {report['recommendation']}",
+            "",
+            "## Summary",
+            "",
+            f"- **Total Checks**: {report['summary']['total']}",
+            f"- **Passed**: {report['summary']['passed']} ✅",
+            f"- **Failed**: {report['summary']['failed']} ❌",
+            f"- **Critical Failed**: {report['summary']['critical_failed']}",
+            "",
+            "## Detailed Results",
+            "",
+            "| Check | Status | Message |",
+            "|-------|--------|---------|",
+        ]
+        
+        for result in report['results']:
+            status = "✅ PASS" if result['passed'] else "❌ FAIL"
+            lines.append(f"| {result['check']} | {status} | {result['message']} |")
+        
+        lines.extend([
+            "",
+            "## Sign-off",
+            "",
+            "| Role | Decision | Signature | Date |",
+            "|------|----------|-----------|------|",
+            f"| Review Bot | {report['recommendation']} | Auto | {report['timestamp'][:10]} |",
+            "| AI Yang | ☐ | | |",
+            "| 实体Yang | ☐ | | |",
+        ])
+        
+        return "\n".join(lines)
 ```
 
----
+#### 7.4.3 检查类实现
 
-## 8. 本地Agent部署
+```python
+class FileExistsCheck:
+    """检查文件是否存在"""
+    def __init__(self, relative_path: str):
+        self.path = relative_path
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        full_path = project_path / self.path
+        exists = full_path.exists()
+        return CheckResult(
+            check_name=f"FileExists: {self.path}",
+            passed=exists,
+            message=f"{'Found' if exists else 'Missing'}: {self.path}",
+            details={"path": str(full_path), "exists": exists}
+        )
+
+class SectionCheck:
+    """检查文档章节完整性"""
+    def __init__(self, doc_path: str, required: List[str]):
+        self.doc_path = doc_path
+        self.required = required
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        full_path = project_path / self.doc_path
+        if not full_path.exists():
+            return CheckResult(
+                check_name=f"SectionCheck: {self.doc_path}",
+                passed=False,
+                message=f"Document not found: {self.doc_path}"
+            )
+        
+        content = full_path.read_text()
+        # 检查Markdown章节标题
+        sections_found = []
+        missing = []
+        for section in self.required:
+            # 匹配 ## Section 或 ## 1. Section 格式
+            pattern = rf"^##\s+(\d+\.\s+)?{re.escape(section)}"
+            if re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
+                sections_found.append(section)
+            else:
+                missing.append(section)
+        
+        return CheckResult(
+            check_name=f"SectionCheck: {self.doc_path}",
+            passed=len(missing) == 0,
+            message=f"Found {len(sections_found)}/{len(self.required)} sections" if missing else "All required sections present",
+            details={"required": self.required, "found": sections_found, "missing": missing}
+        )
+
+class CoverageCheck:
+    """检查代码覆盖率"""
+    def __init__(self, min_line: int = 90, min_toggle: int = 85, min_fsm: int = 95):
+        self.min_line = min_line
+        self.min_toggle = min_toggle
+        self.min_fsm = min_fsm
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        cov_db = project_path / "Verification/Coverage/coverage_report.json"
+        if not cov_db.exists():
+            return CheckResult(
+                check_name="CoverageCheck",
+                passed=False,
+                message="Coverage report not found"
+            )
+        
+        with open(cov_db) as f:
+            data = json.load(f)
+        
+        line_cov = data.get("line", 0)
+        toggle_cov = data.get("toggle", 0)
+        fsm_cov = data.get("fsm", 0)
+        
+        passed = (line_cov >= self.min_line and 
+                  toggle_cov >= self.min_toggle and 
+                  fsm_cov >= self.min_fsm)
+        
+        return CheckResult(
+            check_name="CoverageCheck",
+            passed=passed,
+            message=f"Line: {line_cov}% (target: {self.min_line}%), Toggle: {toggle_cov}% (target: {self.min_toggle}%), FSM: {fsm_cov}% (target: {self.min_fsm}%)",
+            details={"line": line_cov, "toggle": toggle_cov, "fsm": fsm_cov}
+        )
+
+class LintCheck:
+    """运行Lint检查"""
+    def __init__(self, errors_max: int = 0, warnings_max: int = 0):
+        self.errors_max = errors_max
+        self.warnings_max = warnings_max
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        result = subprocess.run(
+            ["make", "lint"],
+            cwd=project_path / "Scripts",
+            capture_output=True,
+            text=True
+        )
+        
+        # 解析lint结果
+        errors = result.stdout.count("ERROR") + result.stderr.count("ERROR")
+        warnings = result.stdout.count("WARNING") + result.stderr.count("WARNING")
+        
+        passed = errors <= self.errors_max and warnings <= self.warnings_max
+        
+        return CheckResult(
+            check_name="LintCheck",
+            passed=passed,
+            message=f"Errors: {errors} (max: {self.errors_max}), Warnings: {warnings} (max: {self.warnings_max})",
+            details={"errors": errors, "warnings": warnings, "returncode": result.returncode}
+        )
+
+class FilelistCheck:
+    """检查filelist中的文件是否都存在"""
+    def __init__(self, filelist_path: str):
+        self.filelist_path = filelist_path
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        fl_path = project_path / self.filelist_path
+        if not fl_path.exists():
+            return CheckResult(
+                check_name=f"FilelistCheck: {self.filelist_path}",
+                passed=False,
+                message=f"Filelist not found: {self.filelist_path}"
+            )
+        
+        missing_files = []
+        with open(fl_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and not line.startswith('//'):
+                    file_path = project_path / line
+                    if not file_path.exists():
+                        missing_files.append(line)
+        
+        return CheckResult(
+            check_name=f"FilelistCheck: {self.filelist_path}",
+            passed=len(missing_files) == 0,
+            message=f"All files present" if not missing_files else f"Missing {len(missing_files)} files",
+            details={"filelist": self.filelist_path, "missing": missing_files}
+        )
+
+class TimingCheck:
+    """检查时序收敛"""
+    def __init__(self, setup_slack_min: float = 0, hold_slack_min: float = 0):
+        self.setup_slack_min = setup_slack_min
+        self.hold_slack_min = hold_slack_min
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        sta_report = project_path / "Design/STA/sta_signoff.rpt"
+        if not sta_report.exists():
+            return CheckResult(
+                check_name="TimingCheck",
+                passed=False,
+                message="STA report not found"
+            )
+        
+        # 解析时序报告提取slack值
+        content = sta_report.read_text()
+        setup_slack = self._extract_slack(content, "Setup")
+        hold_slack = self._extract_slack(content, "Hold")
+        
+        passed = setup_slack >= self.setup_slack_min and hold_slack >= self.hold_slack_min
+        
+        return CheckResult(
+            check_name="TimingCheck",
+            passed=passed,
+            message=f"Setup slack: {setup_slack}ns (min: {self.setup_slack_min}ns), Hold slack: {hold_slack}ns (min: {self.hold_slack_min}ns)",
+            details={"setup_slack": setup_slack, "hold_slack": hold_slack}
+        )
+    
+    def _extract_slack(self, content: str, timing_type: str) -> float:
+        # 从STA报告中提取slack值的简化实现
+        import re
+        pattern = rf"{timing_type}.*slack.*=\s*([-\d.]+)"
+        match = re.search(pattern, content, re.IGNORECASE)
+        return float(match.group(1)) if match else float('-inf')
+
+class PVCheck:
+    """物理验证检查 (DRC/LVS/Antenna)"""
+    def __init__(self, drc_clean: bool = True, lvs_clean: bool = True, antenna_clean: bool = True):
+        self.drc_clean = drc_clean
+        self.lvs_clean = lvs_clean
+        self.antenna_clean = antenna_clean
+        
+    def run(self, project_path: Path, task: Dict) -> CheckResult:
+        pv_dir = project_path / "Design/PV"
+        
+        drc_result = self._check_drc(pv_dir / "drc.rpt")
+        lvs_result = self._check_lvs(pv_dir / "lvs.rpt")
+        antenna_result = self._check_antenna(pv_dir / "antenna.rpt")
+        
+        passed = (drc_result["clean"] or not self.drc_clean) and \
+                 (lvs_result["clean"] or not self.lvs_clean) and \
+                 (antenna_result["clean"] or not self.antenna_clean)
+        
+        return CheckResult(
+            check_name="PVCheck",
+            passed=passed,
+            message=f"DRC: {'Clean' if drc_result['clean'] else f'{drc_result[\"errors\"]} errors'}, LVS: {'Clean' if lvs_result['clean'] else 'Mismatch'}, Antenna: {'Clean' if antenna_result['clean'] else 'Violations'}",
+            details={"drc": drc_result, "lvs": lvs_result, "antenna": antenna_result}
+        )
+    
+    def _check_drc(self, report_path: Path) -> Dict:
+        if not report_path.exists():
+            return {"clean": False, "errors": 0, "message": "Report not found"}
+        content = report_path.read_text()
+        errors = content.count("ERROR") + content.count("VIOLATION")
+        return {"clean": errors == 0, "errors": errors}
+    
+    def _check_lvs(self, report_path: Path) -> Dict:
+        if not report_path.exists():
+            return {"clean": False, "message": "Report not found"}
+        content = report_path.read_text()
+        return {"clean": "CORRECT" in content.upper()}
+    
+    def _check_antenna(self, report_path: Path) -> Dict:
+        if not report_path.exists():
+            return {"clean": False, "violations": 0, "message": "Report not found"}
+        content = report_path.read_text()
+        violations = content.count("VIOLATION")
+        return {"clean": violations == 0, "violations": violations}
+```
+
+#### 7.4.4 集成到任务状态机
+
+```python
+class TaskStateMachine:
+    def __init__(self, project_path: str):
+        self.review_bot = ReviewBot(project_path)
+    
+    def transition(self, task: Dict, event: str):
+        current = task.get("status")
+        
+        if event == "submit_for_review":
+            # 任务提交评审时，先运行Review Bot
+            review_report = self.review_bot.on_task_reviewing(task)
+            
+            # 保存报告到任务
+            task["review_report"] = review_report
+            
+            # 根据结果自动流转或等待人工确认
+            if review_report["recommendation"] == "PASS":
+                # 自动通过，等待AI Yang抽样检查
+                task["status"] = "reviewing"
+                self._notify_ai_yang_sample(task)
+            else:
+                # 需要人工Review
+                task["status"] = "reviewing"
+                self._notify_reviewers(task, review_report)
+                
+        elif event == "review_approve":
+            task["status"] = "completed"
+            self._trigger_downstream_tasks(task)
+            
+        elif event == "review_reject":
+            task["status"] = "rejected"
+            self._notify_assignee(task)
+    
+    def _notify_ai_yang_sample(self, task: Dict):
+        """通知AI Yang进行抽样检查"""
+        message = {
+            "type": "review_sample_request",
+            "task_id": task["id"],
+            "stage": task.get("stage"),
+            "report": task["review_report"],
+            "action_required": "抽样复核"
+        }
+        # 发送到AI Yang的消息队列
+        
+    def _notify_reviewers(self, task: Dict, report: Dict):
+        """通知评审人员进行人工Review"""
+        message = {
+            "type": "manual_review_required",
+            "task_id": task["id"],
+            "stage": task.get("stage"),
+            "report": report,
+            "issues": [r for r in report["results"] if not r["passed"]],
+            "action_required": "人工评审"
+        }
+        # 发送到相关Reviewer
+```
+
+#### 7.4.5 触发方式
+
+| 触发场景 | 命令/方式 | 执行检查 | 阻断行为 |
+|---------|-----------|---------|----------|
+| 开发者主动提交 | `make submit-review STAGE=IDR` | 指定阶段全部检查 | 失败时阻止提交 |
+| Git pre-commit hook | 自动触发 | 基础格式检查 | 失败时阻止commit |
+| CI/CD pipeline | 阶段 gate | 完整检查集 | 失败时阻断流程 |
+| PM Agent调度 | 里程碑前 | 批量阶段检查 | 生成 readiness report |
+| 定时检查 | cron job | 回归检查 | 发送告警通知 |
+
+#### 7.4.6 CLI 接口
+
+```bash
+# 执行指定阶段的Review检查
+python Scripts/common/review_bot.py --stage IDR --project .
+
+# 执行所有阶段的检查
+python Scripts/common/review_bot.py --all --project .
+
+# 生成报告但不保存
+python Scripts/common/review_bot.py --stage EDR --dry-run
+
+# 指定任务ID，关联到具体任务
+python Scripts/common/review_bot.py --stage FDR --task TASK-FDR-001
+
+# 仅执行特定检查
+python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageCheck"
+```
+
+#### 7.4.7 与现有Agent的分工
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Review Pipeline                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Review Bot (自动化)                                       │
+│     ├── 文件存在性检查                                        │
+│     ├── 文档格式/章节检查                                     │
+│     ├── 代码覆盖率检查                                        │
+│     ├── Lint/CDC检查                                         │
+│     ├── 时序/物理验证检查                                     │
+│     └── 输出: PASS / CONDITIONAL / FAIL                     │
+│                      ↓                                       │
+│  2. AI Yang (抽样复核)                                        │
+│     ├── 复杂逻辑检查                                          │
+│     ├── 架构一致性评估                                        │
+│     ├── 风险识别                                              │
+│     └── 输出: 批准 / 有条件批准 / 驳回                        │
+│                      ↓                                       │
+│  3. 实体Yang (最终决策)                                       │
+│     ├── 关键决策确认                                          │
+│     ├── 资源/ schedule 权衡                                   │
+│     └── 输出: Gate 通过 / 延期 / 驳回                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Agent | 职责 | 处理时间 | 通过率 |
+|-------|------|---------|--------|
+| **Review Bot** | 自动化客观检查 | < 5分钟 | ~60%基础问题过滤 |
+| **AI Yang** | 智能质量评估 | 1-4小时 | 抽样检查关键项 |
+| **实体Yang** | 最终批准决策 | 按需 | 战略决策 |
+
+#### 7.4.8 报告输出位置
+
+```
+ProjectMgmt/Reviews/
+├── PCD/
+│   ├── REVIEW_PCD_Report.md          # Review Bot生成
+│   ├── REVIEW_PCD_Report.json        # 机器可读格式
+│   ├── Meeting_Minutes_PCD.md        # 人工会议记录
+│   └── CHECKLIST_PCD.md              # 人工复核清单
+├── PAD/
+│   ├── REVIEW_PAD_Report.md
+│   ├── REVIEW_PAD_Report.json
+│   ├── Meeting_Minutes_PAD.md
+│   └── CHECKLIST_PAD.md
+├── EDR/
+│   ├── REVIEW_EDR_Report.md
+│   ├── REVIEW_EDR_Report.json
+│   ├── Meeting_Minutes_EDR.md
+│   └── CHECKLIST_EDR.md
+├── IDR/
+│   ├── REVIEW_IDR_Report.md
+│   ├── REVIEW_IDR_Report.json
+│   ├── Meeting_Minutes_IDR.md
+│   └── CHECKLIST_IDR.md
+├── FDR/
+│   ├── REVIEW_FDR_Report.md
+│   ├── REVIEW_FDR_Report.json
+│   ├── Meeting_Minutes_FDR.md
+│   └── CHECKLIST_FDR.md
+└── PostSilicon/
+    ├── REVIEW_PostSilicon_Report.md
+    ├── REVIEW_PostSilicon_Report.json
+    ├── Meeting_Minutes_PostSilicon.md
+    └── CHECKLIST_PostSilicon.md
+```
+
+#### 7.4.9 Makefile 集成
+
+```makefile
+# Scripts/Makefile - Review Bot集成
+
+.PHONY: review review-pcd review-pad review-edr review-idr review-fdr
+
+# 通用Review提交
+submit-review:
+	@echo "Running Review Bot for stage $(STAGE)..."
+	@python3 common/review_bot.py --stage $(STAGE) --project .. --task $(TASK)
+	@if [ $$? -eq 0 ]; then \
+		echo "Review passed. Waiting for AI Yang/人工确认..."; \
+	else \
+		echo "Review failed. Please fix issues and retry."; \
+		exit 1; \
+	fi
+
+# 各阶段快捷命令
+review-pcd:
+	$(MAKE) submit-review STAGE=PCD
+
+review-pad:
+	$(MAKE) submit-review STAGE=PAD
+
+review-edr:
+	$(MAKE) submit-review STAGE=EDR
+
+review-idr:
+	$(MAKE) submit-review STAGE=IDR
+
+review-fdr:
+	$(MAKE) submit-review STAGE=FDR
+
+# 预提交检查 (Git hook调用)
+pre-commit-check:
+	@echo "Running pre-commit checks..."
+	@python3 common/review_bot.py --stage IDR --checks "LintCheck,FilelistCheck" --dry-run
+```
+
+### 7.3 Review Checklist模板
+
 
 ### 8.1 部署架构
 
