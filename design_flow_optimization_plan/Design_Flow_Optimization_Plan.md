@@ -564,8 +564,6 @@ pr: final
 
 ---
 
-## 多Agent协作机制
-
 ### 5.1 Agent角色定义
 
 ```yaml
@@ -589,9 +587,15 @@ agents:
   design_agent:
     name: "Design Agent"
     role: documentation_writer
-    capabilities: [spec_writing, architecture_doc]
+    capabilities: [spec_writing, architecture_doc, dft_spec, sdc, upf, sgdc]
     location: cloud
-    trigger_keywords: ["design spec", "架构文档"]
+    trigger_keywords: ["design spec", "架构文档", "dft spec", "sdc", "upf"]
+    responsibilities:
+      - Design Spec编写
+      - DFT Spec编写
+      - SDC约束定义
+      - UPF低功耗意图
+      - SpyGlass配置文件(sgdc)
 
   verification_agent:
     name: "Verification Agent"
@@ -600,13 +604,6 @@ agents:
     location: cloud
     trigger_keywords: ["验证计划", "testplan"]
 
-  dft_agent:
-    name: "DFT Agent"
-    role: dft_engineering
-    capabilities: [dft_spec, scan_insertion]
-    location: cloud
-    trigger_keywords: ["DFT", "scan", "ATPG"]
-
   fusa_engineer:
     name: "FuSa Engineer"
     role: functional_safety
@@ -614,29 +611,62 @@ agents:
     location: cloud
     trigger_keywords: ["FMEDA", "安全", "ASIL"]
 
-  ip_architect:
-    name: "IP Architect"
-    role: ip_architecture
-    capabilities: [architecture_design, security_design]
+  architect:
+    name: "Architect"
+    role: chief_architect
+    capabilities: [system_architecture, soc_architecture, fusa_architecture, cybersecurity_architecture, architecture_review]
     location: cloud
-    trigger_keywords: ["架构设计", "安全策略"]
-
-  system_architect:
-    name: "System Architect"
-    role: soc_architecture
-    capabilities: [system_design, integration]
-    location: cloud
-    trigger_keywords: ["系统设计", "SoC架构"]
+    trigger_keywords: ["架构设计", "系统设计", "SoC架构", "FuSa架构", "安全架构"]
+    responsibilities:
+      - 系统架构设计
+      - SoC架构设计
+      - FuSa架构设计
+      - CyberSecurity架构设计
+      - 输出架构文档
+      - Review所有开发流程交付物
 
   # 本地Agent (部署在用户主机)
-  coding_yang:
-    name: "Coding Yang"
-    role: implementation_engineer
-    capabilities: [rtl_coding, simulation, debug, eda_tools]
+  design_coding_agent:
+    name: "Design Coding Agent"
+    role: rtl_implementation
+    capabilities: [rtl_coding, lint_check, synth_env_setup, netlist_generation]
     location: local
     host: user_workstation
-    trigger_keywords: ["Coding Yang 任务:"]
-    eda_tools: [iverilog, verilator, vcs, spyglass, dc_shell]
+    responsibilities:
+      - RTL开发 (Verilog/SystemVerilog)
+      - LINT检查与清理
+      - 综合环境搭建
+      - 生成综合后网表
+    eda_tools: [iverilog, verilator, vcs, spyglass, dc_shell, genus, yosys]
+    trigger_keywords: ["Design Coding Agent 任务:", "RTL开发", "LINT", "综合"]
+
+  verification_coding_agent:
+    name: "Verification Coding Agent"
+    role: verification_implementation
+    capabilities: [testcase_development, env_debug, coverage_collection, regression]
+    location: local
+    host: user_workstation
+    responsibilities:
+      - 验证case开发 (UVM/Directed/Random)
+      - 验证环境调试
+      - 覆盖率收集与报告
+      - 回归测试执行
+    eda_tools: [vcs, xcelium, verilator, imc, verdi]
+    trigger_keywords: ["Verification Coding Agent 任务:", "验证case", "覆盖率", "回归"]
+
+  flow_agent:
+    name: "Flow Agent"
+    role: physical_implementation
+    capabilities: [dft_insertion, sta_analysis, physical_design, signoff]
+    location: local
+    host: user_workstation
+    responsibilities:
+      - DFT插入 (Scan/MBIST)
+      - STA时序分析
+      - 物理设计 (Floorplan/CTS/PR)
+      - Signoff检查 (DRC/LVS)
+    eda_tools: [tessent, modus, pt_shell, tempus, innovus, icc2, openroad, calibre]
+    trigger_keywords: ["Flow Agent 任务:", "DFT", "STA", "PR", "Signoff"]
 ```
 
 ### 5.2 Agent通信协议
