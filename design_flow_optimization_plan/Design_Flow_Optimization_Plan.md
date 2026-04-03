@@ -15,11 +15,10 @@
 3. [目录结构定义](#目录结构定义)
 4. [EDA工具流程脚本](#eda工具流程脚本)
 5. [多Agent协作机制](#多agent协作机制)
-6. [任务管理与自动流转](#任务管理与自动流转)
-7. [项目Dashboard](#项目dashboard)
-8. [Review节点体系](#review节点体系)
-9. [本地Agent部署](#本地agent部署)
-10. [实施路线图](#实施路线图)
+6. [项目Dashboard](#项目dashboard)
+7. [Review节点体系](#review节点体系)
+8. [本地Agent部署](#本地agent部署)
+9. [实施路线图](#实施路线图)
 
 ---
 
@@ -669,41 +668,9 @@ agents:
     trigger_keywords: ["Flow Agent 任务:", "DFT", "STA", "PR", "Signoff"]
 ```
 
-### 5.2 Agent通信协议
+### 5.2 任务管理与自动流转
 
-```json
-{
-  "protocol_version": "1.0",
-  "message_types": {
-    "task_assignment": {
-      "description": "任务分配",
-      "fields": ["task_id", "assignee", "description", "deliverables", "deadline"]
-    },
-    "task_status": {
-      "description": "任务状态更新",
-      "fields": ["task_id", "status", "progress", "blockers", "output_files"]
-    },
-    "review_request": {
-      "description": "评审请求",
-      "fields": ["review_type", "deliverables", "reviewer", "criteria"]
-    },
-    "review_feedback": {
-      "description": "评审反馈",
-      "fields": ["review_id", "issues", "severity", "recommendations"]
-    },
-    "milestone_achieved": {
-      "description": "里程碑达成",
-      "fields": ["milestone", "deliverables", "metrics"]
-    }
-  }
-}
-```
-
----
-
-## 任务管理与自动流转
-
-### 6.1 任务状态机
+#### 5.2.1 任务状态机
 
 ```
 ┌─────────┐    assign    ┌─────────┐    start     ┌─────────┐
@@ -727,7 +694,7 @@ agents:
                                                    └─────────┘
 ```
 
-### 6.2 任务JSON格式
+#### 5.2.2 任务JSON格式
 
 ```json
 {
@@ -803,7 +770,7 @@ agents:
 }
 ```
 
-### 6.3 自动流转规则
+#### 5.2.3 自动流转规则
 
 ```python
 # task_workflow.py - 任务自动流转
@@ -863,11 +830,41 @@ class TaskWorkflow:
             self.update_dashboard(task)
 ```
 
+#### 5.2.4 Agent通信协议
+
+```json
+{
+  "protocol_version": "1.0",
+  "message_types": {
+    "task_assignment": {
+      "description": "任务分配",
+      "fields": ["task_id", "assignee", "description", "deliverables", "deadline"]
+    },
+    "task_status": {
+      "description": "任务状态更新",
+      "fields": ["task_id", "status", "progress", "blockers", "output_files"]
+    },
+    "review_request": {
+      "description": "评审请求",
+      "fields": ["review_type", "deliverables", "reviewer", "criteria"]
+    },
+    "review_feedback": {
+      "description": "评审反馈",
+      "fields": ["review_id", "issues", "severity", "recommendations"]
+    },
+    "milestone_achieved": {
+      "description": "里程碑达成",
+      "fields": ["milestone", "deliverables", "metrics"]
+    }
+  }
+}
+```
+
 ---
 
-## 项目Dashboard
+## 6. 项目Dashboard
 
-### 7.1 Dashboard架构
+### 6.1 Dashboard架构
 
 ```yaml
 # dashboard.yaml - Dashboard配置
@@ -1050,9 +1047,9 @@ class DashboardGenerator:
 
 ---
 
-## Review节点体系
+## 7. Review节点体系
 
-### 8.1 Review阶段定义
+### 7.1 Review阶段定义
 
 ```yaml
 # review_stages.yaml
@@ -1332,9 +1329,9 @@ class AutoReviewer:
 
 ---
 
-## 本地Agent部署
+## 8. 本地Agent部署
 
-### 9.1 部署架构
+### 8.1 部署架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1390,7 +1387,7 @@ class AutoReviewer:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 9.2 Docker部署配置
+### 8.2 Docker部署配置
 
 ```dockerfile
 # Dockerfile.coding-yang
@@ -1463,7 +1460,7 @@ networks:
     driver: bridge
 ```
 
-### 9.3 本地Agent代码
+### 8.3 本地Agent代码
 
 ```python
 #!/usr/bin/env python3
@@ -1662,7 +1659,7 @@ if __name__ == "__main__":
     asyncio.run(agent.run())
 ```
 
-### 9.4 部署脚本
+### 8.4 部署脚本
 
 ```bash
 #!/bin/bash
@@ -1731,9 +1728,9 @@ echo "Coding Yang已就绪，等待任务分配..."
 
 ---
 
-## 实施路线图
+## 9. 实施路线图
 
-### 10.1 阶段划分
+### 9.1 阶段划分
 
 ```
 Phase 1: 基础设施 (Week 1-2)
