@@ -109,50 +109,50 @@ project/
 │   ├── Tasks/                # Agent任务清单（按项目节点分类）
 │   │   ├── PCD/              # Project Concept Definition
 │   │   │   ├── TASK_PCD_001_MRD.md
-│   │   │   ├── TASK_PCD_002_Feasibility.md
-│   │   │   └── CHECKLIST_PCD.md
+│   │   │   └── TASK_PCD_002_Feasibility.md
 │   │   ├── PAD/              # Product Architecture Definition
 │   │   │   ├── TASK_PAD_001_Arch_Spec.md
 │   │   │   ├── TASK_PAD_002_Safety_Concept.md
-│   │   │   ├── TASK_PAD_003_Security_Concept.md
-│   │   │   ├── REVIEW_PAD_Report.md
-│   │   │   └── CHECKLIST_PAD.md
+│   │   │   └── TASK_PAD_003_Security_Concept.md
 │   │   ├── EDR/              # Engineering Document Review
 │   │   │   ├── TASK_EDR_001_Design_Spec.md
 │   │   │   ├── TASK_EDR_002_Verification_Plan.md
 │   │   │   ├── TASK_EDR_003_DFT_Spec.md
 │   │   │   ├── TASK_EDR_004_CDC_Strategy.md
 │   │   │   ├── TASK_EDR_005_SDC.md
-│   │   │   ├── TASK_EDR_006_UPF.md
-│   │   │   ├── REVIEW_EDR_Report.md
-│   │   │   └── CHECKLIST_EDR.md
+│   │   │   └── TASK_EDR_006_UPF.md
 │   │   ├── IDR/              # Implementation Design Review
 │   │   │   ├── TASK_IDR_001_RTL_Implementation.md
 │   │   │   ├── TASK_IDR_002_UVM_Environment.md
 │   │   │   ├── TASK_IDR_003_Testcase_Development.md
-│   │   │   ├── TASK_IDR_004_Coverage_Collection.md
-│   │   │   ├── REVIEW_IDR_Report.md
-│   │   │   └── CHECKLIST_IDR.md
+│   │   │   └── TASK_IDR_004_Coverage_Collection.md
 │   │   ├── FDR/              # Final Design Review
 │   │   │   ├── TASK_FDR_001_Physical_Design.md
 │   │   │   ├── TASK_FDR_002_STA_Signoff.md
 │   │   │   ├── TASK_FDR_003_DFT_Implementation.md
-│   │   │   ├── TASK_FDR_004_PV_Signoff.md
-│   │   │   ├── REVIEW_FDR_Report.md
-│   │   │   └── CHECKLIST_FDR.md
+│   │   │   └── TASK_FDR_004_PV_Signoff.md
 │   │   ├── PostSilicon/      # 硅后验证
 │   │   │   ├── TASK_PS_001_ATE_Program.md
-│   │   │   ├── TASK_PS_002_Validation_Report.md
-│   │   │   └── CHECKLIST_PostSilicon.md
+│   │   │   └── TASK_PS_002_Validation_Report.md
 │   │   └── README.md         # 全局任务索引
 │   │
 │   ├── Reviews/              # 评审记录
 │   │   ├── PCD/
+│   │   │   └── CHECKLIST_PCD.md
 │   │   ├── PAD/
+│   │   │   ├── REVIEW_PAD_Report.md
+│   │   │   └── CHECKLIST_PAD.md
 │   │   ├── EDR/
+│   │   │   ├── REVIEW_EDR_Report.md
+│   │   │   └── CHECKLIST_EDR.md
 │   │   ├── IDR/
+│   │   │   ├── REVIEW_IDR_Report.md
+│   │   │   └── CHECKLIST_IDR.md
 │   │   ├── FDR/
+│   │   │   ├── REVIEW_FDR_Report.md
+│   │   │   └── CHECKLIST_FDR.md
 │   │   └── PostSilicon/
+│   │       └── CHECKLIST_PostSilicon.md
 │   │
 │   ├── Bugs/                 # Bug管理
 │   │   ├── P1_Critical/
