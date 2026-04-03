@@ -1,0 +1,262 @@
+{
+  "schema_version": "1.0",
+  "task_definition": {
+    "description": "Coding Yang任务JSON模板",
+    "usage": "复制此模板并填写具体字段，保存到 ProjectMgmt/Tasks/Coding_Yang/",
+    "naming_convention": "TASK-{PROJECT}-{TYPE}-{SEQUENCE}.json"
+  },
+  
+  "task_id": "TASK-PROJECT-TYPE-001",
+  "project_id": "PROJECT_ID",
+  "project_name": "Project_Name",
+  
+  "task": {
+    "type": "rtl_implementation",
+    "priority": "P0",
+    "title": "Task Title",
+    "summary": "Brief description of the task",
+    
+    "categories": [
+      "rtl_implementation",
+      "verification_env",
+      "testcase_development",
+      "lint_check",
+      "synthesis",
+      "debug",
+      "coverage_closure"
+    ]
+  },
+  
+  "assignment": {
+    "assigned_to": "Coding_Yang",
+    "assigned_by": "PM_Agent",
+    "assigned_date": "2026-04-02T10:00:00+08:00",
+    "deadline": "2026-04-09T18:00:00+08:00",
+    "expected_duration": "16h",
+    "actual_duration": null
+  },
+  
+  "status": {
+    "current": "pending",
+    "history": [
+      {
+        "status": "pending",
+        "timestamp": "2026-04-02T10:00:00+08:00",
+        "note": "Task created"
+      }
+    ],
+    "valid_transitions": {
+      "pending": ["assigned", "cancelled"],
+      "assigned": ["running", "cancelled"],
+      "running": ["submitted", "blocked"],
+      "submitted": ["reviewing"],
+      "reviewing": ["approved", "rejected"],
+      "rejected": ["running", "cancelled"],
+      "approved": ["completed"],
+      "blocked": ["running", "cancelled"],
+      "cancelled": [],
+      "completed": []
+    }
+  },
+  
+  "description": {
+    "requirements": [
+      "Requirement 1",
+      "Requirement 2",
+      "Requirement 3"
+    ],
+    
+    "acceptance_criteria": [
+      "Criterion 1: measurable metric",
+      "Criterion 2: test requirement",
+      "Criterion 3: documentation requirement"
+    ],
+    
+    "technical_specifications": {
+      "language": "Verilog-2001 / SystemVerilog",
+      "coding_standard": "Company_Coding_Standard_v2.0",
+      "synthesis_target": "synthesizable",
+      "testbench_type": "UVM / Directed / Random"
+    },
+    
+    "constraints": {
+      "timing": "None specified",
+      "area": "None specified",
+      "power": "None specified",
+      "security": "None specified"
+    }
+  },
+  
+  "deliverables": {
+    "rtl_files": [
+      {
+        "path": "Database/DesignData/RTL/module_name.v",
+        "description": "Module implementation",
+        "required": true
+      }
+    ],
+    
+    "testbench_files": [
+      {
+        "path": "Database/Verification/Testcases/directed/tc_test_name.sv",
+        "description": "Test case",
+        "required": true
+      }
+    ],
+    
+    "reports": [
+      {
+        "path": "ProjectMgmt/Tasks/Coding_Yang/TASK-PROJECT-TYPE-001_report.md",
+        "template": "report_template.md",
+        "required": true
+      }
+    ],
+    
+    "other_files": []
+  },
+  
+  "dependencies": {
+    "pre_tasks": [
+      {
+        "task_id": "TASK-PROJECT-SPEC-001",
+        "relationship": "requires",
+        "status": "completed"
+      }
+    ],
+    
+    "post_tasks": [
+      {
+        "task_id": "TASK-PROJECT-LINT-001",
+        "relationship": "triggers",
+        "auto_trigger": true
+      }
+    ],
+    
+    "blocks": [],
+    
+    "external_dependencies": []
+  },
+  
+  "execution": {
+    "working_directory": "sandbox/project_name",
+    
+    "environment_setup": [
+      "source /opt/eda/setup.sh",
+      "export PROJECT_ROOT=$(pwd)"
+    ],
+    
+    "commands": [
+      {
+        "step": 1,
+        "command": "make rtl",
+        "description": "Compile RTL",
+        "timeout": 300,
+        "on_failure": "abort"
+      },
+      {
+        "step": 2,
+        "command": "make sim TEST=tc_smoke",
+        "description": "Run smoke test",
+        "timeout": 600,
+        "on_failure": "abort"
+      },
+      {
+        "step": 3,
+        "command": "make coverage",
+        "description": "Collect coverage",
+        "timeout": 300,
+        "on_failure": "continue"
+      }
+    ],
+    
+    "retry_policy": {
+      "max_attempts": 3,
+      "retry_delay_seconds": 60,
+      "on_final_failure": "notify_pm_and_escalate"
+    },
+    
+    "resource_requirements": {
+      "cpu_cores": 4,
+      "memory_gb": 8,
+      "disk_gb": 10,
+      "gpu_required": false
+    }
+  },
+  
+  "validation": {
+    "auto_checks": [
+      {
+        "type": "file_exists",
+        "files": ["Database/DesignData/RTL/module_name.v"],
+        "required": true
+      },
+      {
+        "type": "simulation_pass",
+        "test": "tc_smoke",
+        "required": true
+      },
+      {
+        "type": "coverage_threshold",
+        "line_coverage_min": 90,
+        "toggle_coverage_min": 85,
+        "required": true
+      },
+      {
+        "type": "lint_clean",
+        "max_warnings": 0,
+        "max_errors": 0,
+        "required": true
+      }
+    ],
+    
+    "manual_checks": [
+      {
+        "type": "code_review",
+        "reviewer": "AI_Yang",
+        "required": true
+      }
+    ]
+  },
+  
+  "notifications": {
+    "on_assign": ["Coding_Yang"],
+    "on_start": ["PM_Agent"],
+    "on_complete": ["PM_Agent", "AI_Yang"],
+    "on_block": ["PM_Agent"],
+    "on_failure": ["PM_Agent", "AI_Yang"],
+    
+    "channels": ["email", "feishu", "dashboard"]
+  },
+  
+  "metadata": {
+    "created_by": "PM_Agent",
+    "created_date": "2026-04-02T09:00:00+08:00",
+    "modified_by": null,
+    "modified_date": null,
+    
+    "project_phase": "IDR",
+    "milestone": "RTL Development",
+    
+    "tags": ["rtl", "implementation", "priority-high"],
+    
+    "estimated_effort": {
+      "hours": 16,
+      "story_points": 5
+    },
+    
+    "actual_effort": {
+      "hours": null,
+      "story_points": null
+    }
+  },
+  
+  "comments": [
+    {
+      "author": "PM_Agent",
+      "timestamp": "2026-04-02T09:00:00+08:00",
+      "content": "Task created"
+    }
+  ],
+  
+  "attachments": []
+}
