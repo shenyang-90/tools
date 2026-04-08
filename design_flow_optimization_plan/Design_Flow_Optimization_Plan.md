@@ -362,146 +362,6 @@ project/
     ├── Tessent/
     ├── Calibre/
     └── Others/
-```
-│   │   ├── Coding_Yang/      # RTL/验证实现任务
-│   │   ├── Design_Agent/     # 设计文档任务
-│   │   ├── Verification_Agent/ # 验证文档任务
-│   │   ├── DFT_Agent/        # DFT任务
-│   │   ├── FuSa_Engineer/    # 功能安全任务
-│   │   ├── IP_Architect/     # IP架构任务（IP项目）
-│   │   ├── System_Architect/ # 系统架构任务（SoC项目）
-│   │   ├── PM_Agent/         # 项目管理任务
-│   │   └── README.md         # 全局任务索引
-│   ├── Reviews/              # 评审记录
-│   │   ├── PCD/              # Project Concept Definition
-│   │   ├── PAD/              # Product Architecture Definition
-│   │   ├── EDR/              # Engineering Document Review
-│   │   ├── IDR/              # Implementation Design Review
-│   │   ├── FDR/              # Final Design Review
-│   │   └── PostSilicon/      # 硅后验证
-│   ├── Bugs/                 # Bug管理
-│   │   ├── P1_Critical/      # 致命
-│   │   ├── P2_Major/         # 严重
-│   │   ├── P3_Minor/         # 轻微
-│   │   └── P4_Trivial/       # 可忽略
-│   ├── MeetingMinutes/       # 会议记录
-│   ├── Milestones/           # 阶段交付物汇总
-│   ├── RiskMgmt/             # 风险管理
-│   ├── ChangeMgmt/           # 变更管理
-│   └── StatusReports/        # 状态报告
-│
-├── Docs/                     # 文档
-│   ├── Arch/                 # 架构文档
-│   ├── Design/               # 设计规格
-│   │   ├── Interface_Specs/       # 接口规格
-│   │   └── Module_Specs/          # 模块规格
-│   ├── Verification/         # 验证计划与报告
-│   ├── FuSa/                 # 功能安全文档
-│   │   ├── FMEDA_Report.md
-│   │   ├── Safety_Concept.md
-│   │   └── Safety_Mechanism_Signals.md
-│   ├── DFT/                  # DFT规格
-│   ├── Physical/             # 物理设计文档
-│   └── Firmware/             # 固件文档
-│
-├── Design/                   # 设计数据
-│   ├── RTL/                  # RTL源码 (.v/.sv)
-│   │   ├── top/              # 顶层模块
-│   │   ├── core/             # 核心模块
-│   │   ├── interface/        # 接口模块
-│   │   └── safety/           # 安全机制模块
-│   ├── Netlist/              # 综合后网表
-│   │   ├── synth/            # 综合网表
-│   │   ├── dft/              # DFT插入后网表
-│   │   └── pr/               # PR后网表
-│   ├── GDS/                  # 版图数据
-│   ├── SDC/                  # 时序约束
-│   ├── UPF/                  # 低功耗意图
-│   └── Constraints/          # 其他约束文件
-│
-├── Verification/             # 验证环境
-│   ├── Env/                  # 验证环境
-│   │   ├── uvm/              # UVM环境
-│   │   ├── tb/               # Testbench
-│   │   ├── sva/              # 断言
-│   │   └── tvla/             # 侧信道测试
-│   ├── Testcases/            # 测试用例
-│   │   ├── directed/         # 定向测试
-│   │   ├── random/           # 随机测试
-│   │   └── vectors/          # 测试向量
-│   ├── Regression/           # 回归测试配置
-│   └── Coverage/             # 覆盖率数据
-│
-├── Validation/               # 硅前/硅后验证
-│   ├── FPGA/                 # FPGA验证
-│   ├── ATE/                  # ATE测试程序
-│   └── PostSilicon/          # 硅后验证
-│
-├── Firmware/                 # 固件
-│   ├── BootROM/              # BootROM代码
-│   ├── Drivers/              # 驱动程序
-│   ├── HAL_BSP/              # HAL/BSP
-│   └── TestPrograms/         # 测试程序
-│
-├── Scripts/                  # EDA工具脚本 [优化重点]
-│   ├── Makefile              # 统一入口
-│   ├── flow.py               # 流程控制脚本
-│   ├── config.mk             # 工具链配置
-│   ├── common/               # 公共脚本库
-│   │   ├── utils.tcl
-│   │   ├── report_parser.py
-│   │   └── metrics_collect.sh
-│   ├── rtl/                  # RTL仿真脚本
-│   │   ├── iverilog.mk
-│   │   ├── verilator.mk
-│   │   ├── vcs.mk
-│   │   └── xrun.mk
-│   ├── lint/                 # Lint检查脚本
-│   │   ├── spyglass.mk
-│   │   ├── verilator_lint.mk
-│   │   └── ascent.mk
-│   ├── synth/                # 逻辑综合脚本
-│   │   ├── dc_shell.mk
-│   │   ├── genus.mk
-│   │   └── yosys.mk
-│   ├── dft/                  # DFT脚本
-│   │   ├── tessent.mk
-│   │   ├── modus.mk
-│   │   └── dftadvisor.mk
-│   ├── pr/                   # 物理设计脚本
-│   │   ├── innovus.mk
-│   │   ├── icc2.mk
-│   │   └── openroad.mk
-│   ├── sta/                  # 时序分析脚本
-│   │   ├── pt_shell.mk
-│   │   ├── tempus.mk
-│   │   └── opensta.mk
-│   ├── lec/                  # 形式验证脚本
-│   │   ├── conformal.mk
-│   │   └── formality.mk
-│   └── signoff/              # Signoff脚本
-│       ├── calibre.mk
-│       ├── pegasus.mk
-│       └── klayout.mk
-│
-├── Reference/                # 参考资料
-│   ├── NIST_Standards/
-│   ├── Datasheets/
-│   └── AppNotes/
-│
-└── Temp/                     # EDA工具临时文件（不提交git）
-    ├── VCS/                  # VCS仿真中间文件
-    ├── Verilator/            # Verilator编译目录
-    ├── Spyglass/             # Spyglass报告
-    ├── DesignCompiler/       # DC工作目录
-    ├── ICC2/                 # ICC2工作目录
-    ├── Innovus/              # Innovus工作目录
-    ├── PrimeTime/            # PT工作目录
-    ├── Tessent/              # DFT工作目录
-    ├── Calibre/              # PV工作目录
-    └── Others/               # 其他临时文件
-```
-
 ---
 
 ## EDA工具流程脚本
@@ -811,6 +671,8 @@ pr: final
 ```
 
 ---
+
+## 5. 多Agent协作机制
 
 ### 5.1 Agent角色定义
 
@@ -1451,7 +1313,7 @@ review_stages:
       exit_condition: "量产批准"
 ```
 
-### 8.2 Review Checklist模板
+### 7.2 Review Checklist模板
 
 ```markdown
 # {{STAGE}} Review Checklist
@@ -1514,11 +1376,11 @@ review_stages:
 | 最终批准人 | ☐ | |
 ```
 
-### 7.2 Review Bot 实现
+### 7.3 Review Bot 实现
 
 Review Bot 是自动化Review检查引擎，作为任务进入 REVIEWING 状态时的第一道质量关卡。
 
-#### 7.4.1 架构定位
+#### 7.3.1 架构定位
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -1531,7 +1393,7 @@ Review Bot 是自动化Review检查引擎，作为任务进入 REVIEWING 状态�
 └─────────────────────────────────────────────────────────┘
 ```
 
-#### 7.4.2 核心实现
+#### 7.3.2 核心实现
 
 ```python
 #!/usr/bin/env python3
@@ -1726,7 +1588,7 @@ class ReviewBot:
         return "\n".join(lines)
 ```
 
-#### 7.4.3 检查类实现
+#### 7.3.3 检查类实现
 
 ```python
 class FileExistsCheck:
@@ -1951,7 +1813,7 @@ class PVCheck:
         return {"clean": violations == 0, "violations": violations}
 ```
 
-#### 7.4.4 集成到任务状态机
+#### 7.3.4 集成到任务状态机
 
 ```python
 class TaskStateMachine:
@@ -2010,7 +1872,7 @@ class TaskStateMachine:
         # 发送到相关Reviewer
 ```
 
-#### 7.4.5 触发方式
+#### 7.3.5 触发方式
 
 | 触发场景 | 命令/方式 | 执行检查 | 阻断行为 |
 |---------|-----------|---------|----------|
@@ -2020,7 +1882,7 @@ class TaskStateMachine:
 | PM Agent调度 | 里程碑前 | 批量阶段检查 | 生成 readiness report |
 | 定时检查 | cron job | 回归检查 | 发送告警通知 |
 
-#### 7.4.6 CLI 接口
+#### 7.3.6 CLI 接口
 
 ```bash
 # 执行指定阶段的Review检查
@@ -2039,7 +1901,7 @@ python Scripts/common/review_bot.py --stage FDR --task TASK-FDR-001
 python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageCheck"
 ```
 
-#### 7.4.7 与现有Agent的分工
+#### 7.3.7 与现有Agent的分工
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -2074,7 +1936,7 @@ python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageChec
 | **AI Yang** | 智能质量评估 | 1-4小时 | 抽样检查关键项 |
 | **实体Yang** | 最终批准决策 | 按需 | 战略决策 |
 
-#### 7.4.8 报告输出位置
+#### 7.3.8 报告输出位置
 
 ```
 ProjectMgmt/Reviews/
@@ -2110,7 +1972,7 @@ ProjectMgmt/Reviews/
     └── CHECKLIST_PostSilicon.md
 ```
 
-#### 7.4.9 Makefile 集成
+#### 7.3.9 Makefile 集成
 
 ```makefile
 # Scripts/Makefile - Review Bot集成
@@ -2150,12 +2012,9 @@ pre-commit-check:
 	@python3 common/review_bot.py --stage IDR --checks "LintCheck,FilelistCheck" --dry-run
 ```
 
-### 7.3 Review Checklist模板
-
+## 8. 本地Agent部署
 
 ### 8.1 部署架构
-
-```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        用户主机 (Linux/Mac)                      │
 │                                                                 │
@@ -2586,7 +2445,7 @@ Phase 5: 优化迭代 (Week 9+)
 └── CI/CD集成
 ```
 
-### 10.2 优先级矩阵
+### 9.2 优先级矩阵
 
 | 功能 | 影响 | 复杂度 | 优先级 | 计划 |
 |------|------|--------|--------|------|
@@ -2599,7 +2458,7 @@ Phase 5: 优化迭代 (Week 9+)
 | 商业工具集成 | 中 | 高 | P2 | Week 7-8 |
 | CI/CD集成 | 低 | 高 | P3 | Week 9+ |
 
-### 10.3 成功指标
+### 9.3 成功指标
 
 | 指标 | 基线 | 目标 | 测量方式 |
 |------|------|------|----------|
