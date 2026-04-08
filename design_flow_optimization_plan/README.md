@@ -43,6 +43,20 @@
 #### Review 模板
 - `templates/reviews/Review_Checklist_Template.md` - Review 检查清单模板
 - `templates/reviews/Meeting_Minutes_Template.md` - 评审会议记录模板
+- `templates/reviews/ADR_Checklist_PAD.md` - PAD阶段架构设计评审Checklist
+- `templates/reviews/ModuleName_EDR_Checklist.md` - EDR阶段文档评审Checklist
+- `templates/reviews/ModuleName_IDR_Checklist.md` - IDR阶段模块级评审Checklist (42项)
+- `templates/reviews/FDR_Checklist.md` - FDR阶段Tapeout前评审Checklist
+- `templates/reviews/Phase_Gate_Checklist.md` - 六阶段模型门禁汇总
+
+#### 项目管理模板
+- `templates/project_mgmt/Bug_Record_Template.md` - Bug记录模板
+- `templates/project_mgmt/dot_gitignore_template` - 项目.gitignore模板
+- `templates/project_mgmt/Naming_Conventions_Guide.md` - 文件命名规范指南
+- `templates/project_mgmt/EDA_Tool_Matrix.md` - EDA工具矩阵参考
+
+#### 验证规范模板
+- `templates/verification/Coverage_Requirements.md` - 覆盖率要求规范
 
 ## 快速开始
 
