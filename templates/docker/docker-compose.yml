@@ -1,0 +1,29 @@
+# templates/docker/docker-compose.yml - Coding Yang Agent 部署模板
+
+version: '3.8'
+
+services:
+  coding-yang:
+    build:
+      context: ./agent
+      dockerfile: ../docker/Dockerfile
+    container_name: coding-yang-agent
+    volumes:
+      # 工作目录挂载
+      - ${WORKSPACE}:/workspace:rw
+      # EDA工具许可证
+      - ${LM_LICENSE_FILE:-/dev/null}:/opt/licenses:ro
+      # 工具配置
+      - ./config:/opt/config:ro
+    environment:
+      - OPENCLAW_GATEWAY=${OPENCLAW_GATEWAY:-ws://localhost:8080/agent}
+      - AGENT_ID=coding_yang
+      - AGENT_TOKEN=${AGENT_TOKEN}
+      - WORKSPACE=/workspace
+    networks:
+      - eda_network
+    restart: unless-stopped
+
+networks:
+  eda_network:
+    driver: bridge

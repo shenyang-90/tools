@@ -1,8 +1,8 @@
 # 车规级芯片设计全流程优化方案
 
 ## 版本信息
-- **版本**: v1.0
-- **日期**: 2026-04-02
+- **版本**: v2.0
+- **日期**: 2025-05-13
 - **作者**: AI Yang
 - **适用范围**: SoC / IP 数字设计项目
 
@@ -14,11 +14,12 @@
 2. [总体架构](#总体架构)
 3. [目录结构定义](#目录结构定义)
 4. [EDA工具流程脚本](#eda工具流程脚本)
-5. [多Agent协作机制](#多agent协作机制)
-6. [项目Dashboard](#项目dashboard)
-7. [Review节点体系](#review节点体系)
-8. [本地Agent部署](#本地agent部署)
-9. [实施路线图](#实施路线图)
+5. [模板库](#模板库)
+6. [多Agent协作机制](#多agent协作机制)
+7. [项目Dashboard](#项目dashboard)
+8. [Review节点体系](#review节点体系)
+9. [本地Agent部署](#本地agent部署)
+10. [实施路线图](#实施路线图)
 
 ---
 
@@ -95,693 +96,243 @@
 
 ## 目录结构定义
 
-### 三级目录结构（保留现有）
+### 项目实例化模板
+
+项目骨架由 `project_template/` 提供，通过 `install` 脚本实例化后生成如下结构：
 
 ```
 project/
-├── pm/              # 项目管理 (所有与项目管理相关的文档)
-│   ├── dashboard/             # 项目状态
+├── ProjectMgmt/              # 项目管理
+│   ├── Planning/             # 项目计划
 │   │   ├── Master_Schedule.md
 │   │   ├── Milestone_Plan.md
 │   │   ├── Resource_Plan.md
-│   │   └── Task_Assignment.md
-│   │
-│   ├── tasks/                # Agent任务清单（按项目节点分类）
-│   │   ├── PCD/              # Project Concept Definition
-│   │   │   ├── TASK_PCD_001_MRD.md
-│   │   │   └── TASK_PCD_002_Feasibility.md
-│   │   ├── PAD/              # Product Architecture Definition
-│   │   │   ├── TASK_PAD_001_Arch_Spec.md
-│   │   │   ├── TASK_PAD_002_Safety_Concept.md
-│   │   │   └── TASK_PAD_003_Security_Concept.md
-│   │   ├── EDR/              # Engineering Document Review
-│   │   │   ├── TASK_EDR_001_Design_Spec.md
-│   │   │   ├── TASK_EDR_002_Verification_Plan.md
-│   │   │   ├── TASK_EDR_003_DFT_Spec.md
-│   │   │   ├── TASK_EDR_004_CDC_Strategy.md
-│   │   │   ├── TASK_EDR_005_SDC.md
-│   │   │   └── TASK_EDR_006_UPF.md
-│   │   ├── IDR/              # Implementation Design Review
-│   │   │   ├── TASK_IDR_001_RTL_Implementation.md
-│   │   │   ├── TASK_IDR_002_UVM_Environment.md
-│   │   │   ├── TASK_IDR_003_Testcase_Development.md
-│   │   │   └── TASK_IDR_004_Coverage_Collection.md
-│   │   ├── FDR/              # Final Design Review
-│   │   │   ├── TASK_FDR_001_Physical_Design.md
-│   │   │   ├── TASK_FDR_002_STA_Signoff.md
-│   │   │   ├── TASK_FDR_003_DFT_Implementation.md
-│   │   │   └── TASK_FDR_004_PV_Signoff.md
-│   │   ├── PostSilicon/      # 硅后验证
-│   │   │   ├── TASK_PS_001_ATE_Program.md
-│   │   │   └── TASK_PS_002_Validation_Report.md
-│   │   └── README.md         # 全局任务索引
-│   │
-│   ├── reviews/              # 评审记录
-│   │   ├── PCD/
-│   │   │   ├── Meeting_Minutes_PCD.md      # 评审会议记录
-│   │   │   └── CHECKLIST_PCD.md
-│   │   ├── PAD/
-│   │   │   ├── Meeting_Minutes_PAD.md      # 评审会议记录
-│   │   │   ├── REVIEW_PAD_Report.md
-│   │   │   └── CHECKLIST_PAD.md
-│   │   ├── EDR/
-│   │   │   ├── Meeting_Minutes_EDR.md      # 评审会议记录
-│   │   │   ├── REVIEW_EDR_Report.md
-│   │   │   └── CHECKLIST_EDR.md
-│   │   ├── IDR/
-│   │   │   ├── Meeting_Minutes_IDR.md      # 评审会议记录
-│   │   │   ├── REVIEW_IDR_Report.md
-│   │   │   └── CHECKLIST_IDR.md
-│   │   ├── FDR/
-│   │   │   ├── Meeting_Minutes_FDR.md      # 评审会议记录
-│   │   │   ├── REVIEW_FDR_Report.md
-│   │   │   └── CHECKLIST_FDR.md
-│   │   └── PostSilicon/
-│   │       ├── Meeting_Minutes_PostSilicon.md  # 评审会议记录
-│   │       └── CHECKLIST_PostSilicon.md
-│   │
-│   ├── bugs/                 # Bug管理
-│   │   ├── P1_Critical/
-│   │   ├── P2_Major/
-│   │   ├── P3_Minor/
-│   │   └── P4_Trivial/
-│   │
+│   │   └── README.md
+│   ├── Tasks/                # Agent任务清单
+│   │   ├── AI_Yang/
+│   │   │   └── TASK_LIST.md
+│   │   ├── Coding_Yang/
+│   │   │   ├── TASK_LIST.md
+│   │   │   └── task_template.json
+│   │   ├── Design_Agent/
+│   │   ├── DFT_Agent/
+│   │   ├── FuSa_Engineer/
+│   │   ├── IP_Architect/
+│   │   ├── PM_Agent/
+│   │   ├── System_Architect/
+│   │   └── Verification_Agent/
+│   ├── Reviews/              # 评审记录
+│   ├── Bugs/                 # Bug管理
 │   ├── MeetingMinutes/       # 会议记录
-│   ├── Milestones/           # 阶段交付物汇总
-│   ├── RiskMgmt/             # 风险管理
-│   ├── ChangeMgmt/           # 变更管理
-│   └── StatusReports/        # 状态报告
+│   └── README.md
 │
-├── Docs/                     # 文档
+├── design/                   # 设计数据
+│   └── DesignData/
+│       └── README.md
+│
+├── docs/                     # 文档
 │   ├── Arch/                 # 架构文档
-│   │   ├── Architecture_Specification.md     # [TEMPLATE: 含History章节记录版本变更]
-│   │   ├── System_Architecture.md            # [TEMPLATE: 含History章节]
-│   │   ├── SoC_Architecture.md               # [TEMPLATE: 含History章节]
-│   │   ├── Safety_Concept.md                 # [TEMPLATE: 含History章节]
-│   │   └── Security_Architecture.md          # [TEMPLATE: 含History章节]
-│   │
 │   ├── Design/               # 设计规格
-│   │   ├── Design_Specification.md           # [TEMPLATE: 含History章节]
-│   │   ├── Interface_Specs/
-│   │   │   ├── AXI4_Interface_Spec.md        # [TEMPLATE: 含History章节]
-│   │   │   └── APB_Interface_Spec.md         # [TEMPLATE: 含History章节]
-│   │   ├── Module_Specs/
-│   │   │   └── Module_Template.md            # [TEMPLATE: 含History章节]
-│   │   ├── SDC/              # 时序约束 (原ToolConfig内容)
-│   │   │   ├── synthesis.sdc                 # [TEMPLATE]
-│   │   │   └── pt_analysis.sdc
-│   │   ├── UPF/              # 低功耗意图
-│   │   │   └── power_intent.upf              # [TEMPLATE]
-│   │   └── SGDC/             # SpyGlass配置
-│   │       ├── lint.sgdc
-│   │       └── cdc.sgdc
-│   │
-│   ├── Verification/         # 验证计划与报告
-│   │   ├── Verification_Plan.md              # [TEMPLATE: 含History章节]
-│   │   ├── Testplan_Coverage.md              # [TEMPLATE: 含History章节]
-│   │   └── Coverage_Report.md                # [TEMPLATE: 含History章节]
-│   │
-│   ├── FuSa/                 # 功能安全文档
-│   │   ├── FMEDA_Report.md                   # [TEMPLATE: 含History章节]
-│   │   ├── Safety_Concept.md                 # [TEMPLATE: 含History章节]
-│   │   └── Safety_Mechanism_Signals.md       # [TEMPLATE: 含History章节]
-│   │
-│   ├── DFT/                  # DFT规格
-│   │   ├── DFT_Specification.md              # [TEMPLATE: 含History章节]
-│   │   └── Scan_Plan.md                      # [TEMPLATE: 含History章节]
-│   │
-│   ├── Physical/             # 物理设计文档
-│   │   ├── Floorplan_Guideline.md            # [TEMPLATE: 含History章节]
-│   │   └── Power_Plan.md                     # [TEMPLATE: 含History章节]
-│   │
-│   └── Firmware/             # 固件文档
-│       └── Firmware_Spec.md                  # [TEMPLATE: 含History章节]
+│   ├── FuSa/                 # 功能安全
+│   ├── Verification/         # 验证计划
+│   │   └── Verification_Plan.md
+│   └── README.md
 │
-├── Design/                   # 设计数据 (原DesignData)
-│   ├── RTL/                  # RTL源码
-│   │   ├── soc/              # SoC层级模块
-│   │   │   ├── top/
-│   │   │   │   ├── soc_top.sv              # [TEMPLATE_WITH_HEADER: 版本记录在header中]
-│   │   │   │   └── soc_top.f
-│   │   │   ├── bus/
-│   │   │   │   ├── bus_matrix.sv
-│   │   │   │   └── bus_matrix.f
-│   │   │   ├── system/
-│   │   │   │   ├── system_ctrl.sv
-│   │   │   │   └── system_ctrl.f
-│   │   │   ├── safety/
-│   │   │   │   ├── safety_monitor.sv
-│   │   │   │   └── safety_monitor.f
-│   │   │   ├── memory/
-│   │   │   │   ├── mem_ctrl.sv
-│   │   │   │   └── mem_ctrl.f
-│   │   │   ├── otp/
-│   │   │   │   ├── otp_ctrl.sv
-│   │   │   │   └── otp_ctrl.f
-│   │   │   ├── clkrst/
-│   │   │   │   ├── clk_rst_ctrl.sv
-│   │   │   │   └── clk_rst_ctrl.f
-│   │   │   └── iomux/
-│   │   │       ├── io_mux.sv
-│   │   │       └── io_mux.f
-│   │   │
-│   │   └── ip/               # IP层级模块
-│   │       ├── uart/
-│   │       │   ├── uart_top.sv             # [TEMPLATE_WITH_HEADER: 版本记录在header中]
-│   │       │   ├── uart_tx.sv
-│   │       │   ├── uart_rx.sv
-│   │       │   ├── uart_regs.sv
-│   │       │   └── uart.f
-│   │       ├── spi/
-│   │       │   ├── spi_top.sv
-│   │       │   ├── spi_master.sv
-│   │       │   ├── spi_slave.sv
-│   │       │   └── spi.f
-│   │       └── i2c/          # 其他IP实例
-│   │           ├── i2c_top.sv
-│   │           └── i2c.f
-│   │
-│   ├── Netlist/              # 综合后网表
-│   │   ├── synth/
-│   │   ├── dft/
-│   │   └── pr/
-│   │
-│   ├── GDS/                  # 版图数据
-│   └── Constraints/          # 其他约束文件
+├── tools/                    # EDA工具脚本
+│   ├── Makefile              # 统一入口
+│   ├── README.md
+│   ├── cocotb/               # Cocotb仿真
+│   ├── ghdl/                 # GHDL仿真
+│   ├── iverilog/             # Icarus Verilog仿真
+│   └── verilator/            # Verilator仿真
 │
 ├── Verification/             # 验证环境
-│   ├── Env/                  # 验证环境
-│   │   ├── uvm/              # UVM基础环境
-│   │   │   ├── base/
-│   │   │   │   ├── base_test.sv            # [TEMPLATE] v0.1.0
-│   │   │   │   ├── base_sequence.sv
-│   │   │   │   └── base_scoreboard.sv
-│   │   │   ├── agents/
-│   │   │   │   ├── axi4_agent.sv
-│   │   │   │   ├── apb_agent.sv
-│   │   │   │   └── uart_agent.sv
-│   │   │   └── env_top.sv
-│   │   │
-│   │   ├── tb/               # Testbench
-│   │   │   ├── tb_top.sv                   # [TEMPLATE] v0.1.0
-│   │   │   ├── tb_top.f
-│   │   │   ├── clock_gen.sv
-│   │   │   └── reset_gen.sv
-│   │   │
-│   │   ├── sva/              # 断言
-│   │   │   ├── protocol_checkers.sv
-│   │   │   ├── safety_assertions.sv
-│   │   │   └── coverage_assertions.sv
-│   │   │
-│   │   └── tvla/             # 侧信道测试
-│   │       └── tvla_testbench.sv
-│   │
-│   ├── Testcases/            # 测试用例
-│   │   ├── directed/         # 定向测试
-│   │   │   ├── tc_smoke.sv                 # [TEMPLATE] v0.1.0
-│   │   │   ├── tc_rst_reg.sv
-│   │   │   ├── tc_basic_rw.sv
-│   │   │   └── tc_interrupt.sv
-│   │   │
-│   │   ├── random/           # 随机测试
-│   │   │   ├── tc_random_tx.sv
-│   │   │   └── tc_stress.sv
-│   │   │
-│   │   └── vectors/          # 测试向量
-│   │       ├── nist_vectors/
-│   │       ├── directed_patterns/
-│   │       └── golden_ref/
-│   │
-│   ├── Regression/           # 回归测试配置
-│   │   ├── regression_full.cfg
-│   │   ├── regression_smoke.cfg
-│   │   └── regression_nightly.cfg
-│   │
-│   └── Coverage/             # 覆盖率数据
-│       ├── coverage_plan.md
-│       └── coverage_report.md
+│   └── README.md
 │
-├── Validation/               # 硅前/硅后验证
-│   ├── FPGA/
-│   ├── ATE/
-│   └── PostSilicon/
+├── Temp/                     # 临时文件（不提交git）
+│   └── README.md
 │
-├── Firmware/                 # 固件
-│   ├── BootROM/
-│   ├── Drivers/
-│   ├── HAL_BSP/
-│   └── TestPrograms/
-│
-├── Scripts/                  # EDA工具脚本
-│   ├── Makefile
-│   ├── flow.py
-│   ├── config.mk
-│   ├── common/
-│   ├── rtl/
-│   ├── lint/
-│   ├── synth/
-│   ├── dft/
-│   ├── pr/
-│   ├── sta/
-│   ├── lec/
-│   └── signoff/
-│
-├── Reference/                # 参考资料
-│   ├── NIST_Standards/
-│   ├── Datasheets/
-│   └── AppNotes/
-│
-└── Temp/                     # EDA工具临时文件（不提交git）
-    ├── VCS/
-    ├── Verilator/
-    ├── Spyglass/
-    ├── DesignCompiler/
-    ├── ICC2/
-    ├── Innovus/
-    ├── PrimeTime/
-    ├── Tessent/
-    ├── Calibre/
-    └── Others/
+├── .gitignore
+├── install                   # 项目初始化脚本
+└── README.md
+```
+
+### 三级目录映射
+
+| 层级 | 目录 | 用途 |
+|------|------|------|
+| L1 | `ProjectMgmt/` | 项目级管理文档 |
+| L2 | `ProjectMgmt/Planning/` | 计划、任务、评审、Bug |
+| L3 | `ProjectMgmt/Tasks/Coding_Yang/` | Agent级任务清单 |
+
 ---
 
 ## EDA工具流程脚本
 
-### 4.1 统一Makefile入口
+### 统一Makefile入口
 
-```makefile
-# Scripts/Makefile - 统一EDA入口
+项目实例化后，`tools/Makefile` 由模板 `templates/scripts/Makefile` 提供。
 
-#==============================================================================
-# 项目配置
-#==============================================================================
-PROJECT_NAME    ?= aes_crypto
-RTL_TOP         ?= aes_top
-TB_TOP          ?= tb_aes_top
-RTL_DIR         ?= ../Design/RTL
-TB_DIR          ?= ../Verification
-SIMULATOR       ?= iverilog  # iverilog/verilator/vcs/xrun
-SYNTH_TOOL      ?= yosys     # yosys/dc/genus
-PR_TOOL         ?= openroad  # openroad/innovus/icc2
+**模板路径**: `sandbox/tools/templates/scripts/Makefile`
 
-#==============================================================================
-# 默认目标
-#==============================================================================
-.PHONY: help lint rtl sim synth dft pr sta signoff clean
+**实例化路径**: `project/tools/Makefile`
 
-help:
-	@echo "================================================================"
-	@echo "$(PROJECT_NAME) - EDA Tool Flow"
-	@echo "================================================================"
-	@echo ""
-	@echo "=== RTL Development ==="
-	@echo "  make rtl               - Compile RTL (lint check)"
-	@echo "  make sim TEST=tc_smoke - Run simulation"
-	@echo "  make regression        - Run regression suite"
-	@echo "  make coverage          - Collect coverage"
-	@echo ""
-	@echo "=== Verification ==="
-	@echo "  make lint              - Run static checks"
-	@echo "  make cdc               - Run CDC checks"
-	@echo "  make sva               - Run assertion checks"
-	@echo ""
-	@echo "=== Implementation ==="
-	@echo "  make synth             - Logic synthesis"
-	@echo "  make dft               - DFT insertion"
-	@echo "  make pr                - Place & Route"
-	@echo "  make sta               - Static timing analysis"
-	@echo ""
-	@echo "=== Signoff ==="
-	@echo "  make lec               - Logic equivalence check"
-	@echo "  make drc               - Design rule check"
-	@echo "  make lvs               - Layout vs schematic"
-	@echo "  make signoff           - Full signoff flow"
-	@echo ""
-	@echo "=== Utilities ==="
-	@echo "  make dashboard         - Update project dashboard"
-	@echo "  make metrics           - Collect metrics"
-	@echo "  make clean             - Clean temporary files"
-	@echo ""
-	@echo "Examples:"
-	@echo "  make sim TEST=tc_nist SIMULATOR=vcs"
-	@echo "  make synth SYNTH_TOOL=dc"
-	@echo "================================================================"
+Makefile 提供以下目标分类：
 
-#==============================================================================
-# RTL Development
-#==============================================================================
-rtl: lint
-	@echo "[RTL] Compilation successful"
+| 类别 | 目标 | 说明 |
+|------|------|------|
+| RTL | `rtl`, `sim`, `regression`, `coverage`, `view` | 编译、仿真、回归、覆盖率、波形 |
+| Verification | `lint`, `cdc`, `sva`, `formal` | 静态检查、CDC、断言、形式验证 |
+| Implementation | `synth`, `synth_opt`, `dft`, `pr`, `sta` | 综合、优化、DFT、物理设计、STA |
+| Signoff | `lec`, `drc`, `lvs`, `signoff` | 等价性、DRC、LVS、完整签核 |
+| Utility | `info`, `dashboard`, `metrics`, `docs`, `clean` | 信息、仪表板、指标、文档、清理 |
+| CI/CD | `ci-lint`, `ci-sim`, `ci-coverage`, `ci-full` | 持续集成目标 |
 
-sim:
-	$(MAKE) -f rtl/$(SIMULATOR).mk TEST=$(TEST)
+### 工具链配置
 
-regression:
-	@./common/run_regression.py --suite full
+**模板路径**: `sandbox/tools/templates/scripts/config.mk`
 
-coverage:
-	@./common/collect_coverage.py --tool $(SIMULATOR)
+配置项包括：
+- 开源工具路径（iverilog、verilator、yosys、openroad 等）
+- 商业工具路径（VCS、DC、Innovus、PrimeTime 等，需许可证）
+- 工艺库配置（PDK_ROOT、STD_CELL_LIB、LEF_FILE 等）
+- 设计约束（CLK_PERIOD、CLK_PORT、RESET_PORT、INPUT_DELAY、OUTPUT_DELAY）
+- 覆盖率阈值（COVERAGE_LINE_THRESHOLD、COVERAGE_TOGGLE_THRESHOLD 等）
 
-#==============================================================================
-# Verification
-#==============================================================================
-lint:
-	$(MAKE) -f lint/lint.mk TOOL=$(LINT_TOOL)
+### 各工具链脚本
 
-cdc:
-	$(MAKE) -f lint/cdc.mk
-
-sva:
-	$(MAKE) -f rtl/$(SIMULATOR).mk TARGET=sva
-
-#==============================================================================
-# Implementation
-#==============================================================================
-synth:
-	$(MAKE) -f synth/$(SYNTH_TOOL).mk
-
-dft:
-	$(MAKE) -f dft/$(DFT_TOOL).mk
-
-pr:
-	$(MAKE) -f pr/$(PR_TOOL).mk
-
-sta:
-	$(MAKE) -f sta/sta.mk
-
-#==============================================================================
-# Signoff
-#==============================================================================
-lec:
-	$(MAKE) -f lec/lec.mk
-
-drc:
-	$(MAKE) -f signoff/pv.mk TARGET=drc
-
-lvs:
-	$(MAKE) -f signoff/pv.mk TARGET=lvs
-
-signoff: lec sta drc lvs
-	@echo "[Signoff] All checks passed"
-
-#==============================================================================
-# Utilities
-#==============================================================================
-dashboard:
-	@./common/update_dashboard.py
-
-metrics:
-	@./common/metrics_collect.sh
-
-clean:
-	@rm -rf ../../Temp/*
-	@echo "[Clean] Temporary files removed"
-```
-
-### 4.2 工具链配置 (config.mk)
-
-```makefile
-# Scripts/config.mk - 工具链配置
-
-#==============================================================================
-# 工具路径 (可自定义)
-#==============================================================================
-# 开源工具 (默认)
-IVERILOG        ?= iverilog
-VVP             ?= vvp
-VERILATOR       ?= verilator
-YOSYS           ?= yosys
-OPENROAD        ?= openroad
-OPENSTA         ?= opensta
-MAGIC           ?= magic
-NETGEN          ?= netgen
-KLAYOUT         ?= klayout
-
-# 商业工具 (需配置)
-VCS             ?= vcs
-VERDI           ?= verdi
-DC_SHELL        ?= dc_shell
-GENUS           ?= genus
-INNOVUS         ?= innovus
-ICC2            ?= icc2
-PRIMETIME       ?= pt_shell
-TEMPUS          ?= tempus
-CONFORMAL       ?= lec
-FORMALITY       ?= formality
-TESSENT         ?= tessent
-MODUS           ?= modus
-SPYGLASS        ?= spyglass
-ASCENT          ?= ascent
-CALIBRE         ?= calibre
-
-#==============================================================================
-# 工艺库配置
-#==============================================================================
-PROCESS_NODE    ?= tsmc7nm
-PDK_ROOT        ?= /opt/pdk/$(PROCESS_NODE)
-STD_CELL_LIB    ?= $(PDK_ROOT)/lib/stdcells.lib
-IO_LIB          ?= $(PDK_ROOT)/lib/iocells.lib
-LEF_FILE        ?= $(PDK_ROOT)/lef/stdcells.lef
-TECH_LEF        ?= $(PDK_ROOT)/lef/tech.lef
-GDS_FILE        ?= $(PDK_ROOT)/gds/stdcells.gds
-
-#==============================================================================
-# 设计约束
-#==============================================================================
-CLK_PERIOD      ?= 10.0
-CLK_PORT        ?= clk
-RESET_PORT      ?= rst_n
-INPUT_DELAY     ?= 2.0
-OUTPUT_DELAY    ?= 2.0
-```
-
-### 4.3 仿真脚本模板 (iverilog.mk)
-
-```makefile
-# Database/Scripts/rtl/iverilog.mk - Icarus Verilog仿真
-
-TEST            ?= tc_smoke
-OUT_DIR         ?= ../../Temp/VCS
-RTL_DIR         ?= ../Design/RTL
-TC_DIR          ?= ../Verification/Testcases/directed
-TB_DIR          ?= ../Verification/Env/tb
-
-COMP_FLAGS      = -g2012 -Wall \
-                  -y $(RTL_DIR) \
-                  -I $(RTL_DIR) \
-                  -I $(TB_DIR) \
-                  -D SIMULATION \
-                  -D DUMP_VCD
-
-.PHONY: compile sim view clean
-
-compile:
-	@mkdir -p $(OUT_DIR)
-	@echo "[Iverilog] Compiling $(TEST)..."
-	$(IVERILOG) $(COMP_FLAGS) -o $(OUT_DIR)/$(TEST).out \
-		$(TC_DIR)/$(TEST).sv 2>&1 | tee $(OUT_DIR)/$(TEST)_compile.log
-
-sim: compile
-	@echo "[Iverilog] Running $(TEST)..."
-	cd $(OUT_DIR) && $(VVP) $(TEST).out 2>&1 | tee $(TEST)_sim.log
-	@echo "[Iverilog] Simulation complete"
-	@./common/parse_sim_log.py $(OUT_DIR)/$(TEST)_sim.log
-
-view:
-	gtkwave $(OUT_DIR)/$(TEST).vcd &
-
-clean:
-	@rm -f $(OUT_DIR)/$(TEST).out $(OUT_DIR)/$(TEST)_*.log $(OUT_DIR)/$(TEST).vcd
-```
-
-### 4.4 综合脚本模板 (yosys.mk)
-
-```makefile
-# Database/Scripts/synth/yosys.mk - Yosys综合
-
-OUT_DIR         ?= ../../Temp/Yosys
-RTL_DIR         ?= ../Design/RTL
-TOP             ?= $(RTL_TOP)
-
-.PHONY: synth synth_opt clean
-
-synth:
-	@mkdir -p $(OUT_DIR)
-	@echo "[Yosys] Synthesizing $(TOP)..."
-	$(YOSYS) -p "
-		read_verilog $(RTL_DIR)/*.v;
-		synth -top $(TOP);
-		dfflibmap -liberty $(STD_CELL_LIB);
-		abc -liberty $(STD_CELL_LIB);
-		clean;
-		write_verilog $(OUT_DIR)/$(TOP)_synth.v;
-		write_sdc $(OUT_DIR)/$(TOP).sdc;
-	" 2>&1 | tee $(OUT_DIR)/yosys.log
-	@echo "[Yosys] Synthesis complete"
-
-synth_opt: synth
-	@echo "[Yosys] Optimizing..."
-	$(YOSYS) -p "
-		read_verilog $(OUT_DIR)/$(TOP)_synth.v;
-		read_liberty $(STD_CELL_LIB);
-		opt;
-		techmap;
-		opt;
-		write_verilog $(OUT_DIR)/$(TOP)_opt.v;
-	" 2>&1 | tee $(OUT_DIR)/yosys_opt.log
-```
-
-### 4.5 物理设计脚本模板 (openroad.mk)
-
-```makefile
-# Database/Scripts/pr/openroad.mk - OpenROAD物理设计
-
-OUT_DIR         ?= ../../Temp/OpenROAD
-RTL_TOP         ?= aes_top
-
-.PHONY: floorplan place cts route final
-
-floorplan:
-	@mkdir -p $(OUT_DIR)
-	@echo "[OpenROAD] Floorplan..."
-	openroad -exit $(SCRIPTS_DIR)/pr/floorplan.tcl \
-		-log $(OUT_DIR)/floorplan.log
-
-place: floorplan
-	@echo "[OpenROAD] Placement..."
-	openroad -exit $(SCRIPTS_DIR)/pr/place.tcl \
-		-log $(OUT_DIR)/place.log
-
-cts: place
-	@echo "[OpenROAD] CTS..."
-	openroad -exit $(SCRIPTS_DIR)/pr/cts.tcl \
-		-log $(OUT_DIR)/cts.log
-
-route: cts
-	@echo "[OpenROAD] Routing..."
-	openroad -exit $(SCRIPTS_DIR)/pr/route.tcl \
-		-log $(OUT_DIR)/route.log
-
-final: route
-	@echo "[OpenROAD] Final..."
-	openroad -exit $(SCRIPTS_DIR)/pr/final.tcl \
-		-log $(OUT_DIR)/final.log
-
-pr: final
-	@echo "[OpenROAD] Physical design complete"
-```
+| 工具 | 模板路径 | 说明 |
+|------|---------|------|
+| Icarus Verilog | `templates/scripts/iverilog/` | compile.sh、simulate.sh、waveform.sh、Makefile |
+| Verilator | `templates/scripts/verilator/` | compile.sh、simulate.sh、lint.sh、Makefile |
+| GHDL | `templates/scripts/ghdl/` | compile.sh、elaborate.sh、simulate.sh、waveform.sh、Makefile |
+| Cocotb | `templates/scripts/cocotb/` | run.sh、test_{{RTL_TOP}}.py、Makefile |
+| Yosys | `templates/scripts/yosys/yosys.mk` | 综合脚本模板 |
+| OpenROAD | `templates/scripts/openroad/openroad.mk` | 物理设计脚本模板 |
 
 ---
 
-## 5. 多Agent协作机制
+## 模板库
 
-### 5.1 Agent角色定义
+### 模板库结构
 
-```yaml
-# Agent角色配置
-agents:
-  # 云端Agent (OpenClaw托管)
-  pm_agent:
-    name: "PM Agent"
-    role: project_manager
-    capabilities: [planning, scheduling, reporting]
-    location: cloud
-    trigger_keywords: ["项目计划", "里程碑", "进度"]
+所有可复用模板存放于 `sandbox/tools/templates/`：
 
-  ai_yang:
-    name: "AI Yang"
-    role: quality_gatekeeper
-    capabilities: [review, checklist, quality_check]
-    location: cloud
-    trigger_keywords: ["review", "检查", "质量"]
-
-  design_agent:
-    name: "Design Agent"
-    role: documentation_writer
-    capabilities: [spec_writing, architecture_doc, dft_spec, sdc, upf, sgdc]
-    location: cloud
-    trigger_keywords: ["design spec", "架构文档", "dft spec", "sdc", "upf"]
-    responsibilities:
-      - Design Spec编写
-      - DFT Spec编写
-      - SDC约束定义
-      - UPF低功耗意图
-      - SpyGlass配置文件(sgdc)
-
-  verification_agent:
-    name: "Verification Agent"
-    role: verification_planning
-    capabilities: [testplan, coverage_plan]
-    location: cloud
-    trigger_keywords: ["验证计划", "testplan"]
-
-  fusa_agent:
-    name: "FuSa Agent"
-    role: functional_safety
-    capabilities: [fmeda, safety_analysis]
-    location: cloud
-    trigger_keywords: ["FMEDA", "安全", "ASIL"]
-
-  architect:
-    name: "Architect"
-    role: chief_architect
-    capabilities: [system_architecture, soc_architecture, fusa_architecture, cybersecurity_architecture, architecture_review]
-    location: cloud
-    trigger_keywords: ["架构设计", "系统设计", "SoC架构", "FuSa架构", "安全架构"]
-    responsibilities:
-      - 系统架构设计
-      - SoC架构设计
-      - FuSa架构设计
-      - CyberSecurity架构设计
-      - 输出架构文档
-      - Review所有开发流程交付物
-
-  # 本地Agent (部署在用户主机)
-  design_coding_agent:
-    name: "Design Coding Agent"
-    role: rtl_implementation
-    capabilities: [rtl_coding, lint_check, synth_env_setup, netlist_generation]
-    location: local
-    host: user_workstation
-    responsibilities:
-      - RTL开发 (Verilog/SystemVerilog)
-      - LINT检查与清理
-      - 综合环境搭建
-      - 生成综合后网表
-    eda_tools: [iverilog, verilator, vcs, spyglass, dc_shell, genus, yosys]
-    trigger_keywords: ["Design Coding Agent 任务:", "RTL开发", "LINT", "综合"]
-
-  verification_coding_agent:
-    name: "Verification Coding Agent"
-    role: verification_implementation
-    capabilities: [testcase_development, env_debug, coverage_collection, regression]
-    location: local
-    host: user_workstation
-    responsibilities:
-      - 验证case开发 (UVM/Directed/Random)
-      - 验证环境调试
-      - 覆盖率收集与报告
-      - 回归测试执行
-    eda_tools: [vcs, xcelium, verilator, imc, verdi]
-    trigger_keywords: ["Verification Coding Agent 任务:", "验证case", "覆盖率", "回归"]
-
-  flow_agent:
-    name: "Flow Agent"
-    role: physical_implementation
-    capabilities: [dft_insertion, sta_analysis, physical_design, signoff]
-    location: local
-    host: user_workstation
-    responsibilities:
-      - DFT插入 (Scan/MBIST)
-      - STA时序分析
-      - 物理设计 (Floorplan/CTS/PR)
-      - Signoff检查 (DRC/LVS)
-    eda_tools: [tessent, modus, pt_shell, tempus, innovus, icc2, openroad, calibre]
-    trigger_keywords: ["Flow Agent 任务:", "DFT", "STA", "PR", "Signoff"]
+```
+templates/
+├── design/                   # 设计模板
+│   ├── ip/Module_Name/
+│   │   ├── power_intent.upf
+│   │   ├── synthesis.sdc
+│   │   ├── uart.f
+│   │   └── uart_top_template.sv
+│   ├── soc/
+│   │   ├── system/
+│   │   │   └── system_top.sv
+│   │   ├── soc_top.f
+│   │   └── soc_top_template.sv
+│   └── netlist/
+│       └── xxx_syn_netlist.v
+│
+├── docs/                     # 文档模板
+│   ├── Arch/
+│   │   └── Architecture_Specification_Template.md
+│   ├── Module/Module_Name/
+│   │   ├── Coverage_Requirements.md
+│   │   ├── ModuleName_Design_Specification_Template.md
+│   │   └── ModuleName_Verification_Plan_Template.md
+│   ├── DFT/
+│   │   └── DFT_Spec.md
+│   ├── FuSa/
+│   │   └── README.md
+│   └── Physical/
+│       └── README.md
+│
+├── pm/                       # 项目管理模板
+│   ├── bugs/
+│   │   ├── Bug_Record_Template.md
+│   │   ├── P1_Critical/README.md
+│   │   ├── P2_Major/README.md
+│   │   ├── P3_Minor/README.md
+│   │   ├── P4_Trivial/README.md
+│   │   └── README.md
+│   ├── changes/README.md
+│   ├── dashboard/README.md
+│   ├── EDA_Tool_Matrix.md
+│   ├── Naming_Conventions_Guide.md
+│   ├── dot_gitignore_template
+│   ├── reviews/
+│   │   ├── ADR_Checklist_PAD.md
+│   │   ├── FDR_Checklist.md
+│   │   ├── Meeting_Minutes_Template.md
+│   │   ├── ModuleName_EDR_Checklist.md
+│   │   ├── ModuleName_IDR_Checklist.md
+│   │   ├── Phase_Gate_Checklist.md
+│   │   ├── Review_Checklist_Template.md
+│   │   ├── ADR/README.md
+│   │   ├── EDR/Module_Name/README.md
+│   │   ├── FDR/Module_Name/README.md
+│   │   ├── IDR/Module_Name/README.md
+│   │   └── PCD/README.md
+│   └── tasks/
+│       ├── TASK_IDR_001_RTL_Implementation_Template.md
+│       ├── ADR/README.md
+│       ├── EDR/README.md
+│       ├── FDR/README.md
+│       ├── IDR/README.md
+│       └── PCD/README.md
+│
+├── scripts/                  # 脚本模板
+│   ├── cocotb/
+│   ├── ghdl/
+│   ├── iverilog/
+│   ├── verilator/
+│   ├── yosys/
+│   ├── openroad/
+│   ├── flow/
+│   │   ├── task_workflow.py      # 任务状态自动流转引擎
+│   │   └── update_dashboard.py  # Dashboard生成脚本
+│   ├── review_bot/
+│   │   └── review_bot.py         # 自动化Review检查引擎
+│   ├── Makefile
+│   ├── README.md
+│   ├── config.mk
+│   └── install_coding_yang.sh  # Coding Yang Agent安装脚本
+│
+├── docker/                   # 容器化模板
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+└── agent/                    # 本地Agent模板
+    └── agent.py              # Coding Yang Agent核心代码
 ```
 
-### 5.2 任务管理与自动流转
+### 模板使用方式
 
-#### 5.2.1 任务状态机
+1. **项目初始化**：运行 `project_template/install`，自动填充 `{{PROJECT_NAME}}`、`{{RTL_TOP}}` 等占位符
+2. **文档创建**：从 `templates/docs/` 复制模板到项目 `docs/` 目录，替换 `Module_Name`
+3. **脚本复用**：`templates/scripts/` 提供标准化 Makefile 和工具链脚本
+4. **Review Checklist**：从 `templates/pm/reviews/` 复制对应阶段的 Checklist
+
+---
+
+## 多Agent协作机制
+
+### Agent角色定义
+
+| Agent | 角色 | 位置 | 核心能力 | 触发关键词 |
+|-------|------|------|----------|-----------|
+| PM Agent | 项目经理 | 云端 | 计划、排期、报告 | "项目计划"、"里程碑"、"进度" |
+| AI Yang | 质量守门员 | 云端 | Review、Checklist、质检 | "review"、"检查"、"质量" |
+| Design Agent | 文档编写 | 云端 | Spec、架构、约束 | "design spec"、"sdc"、"upf" |
+| Verification Agent | 验证规划 | 云端 | Testplan、Coverage | "验证计划"、"testplan" |
+| FuSa Agent | 功能安全 | 云端 | FMEDA、安全分析 | "FMEDA"、"ASIL" |
+| Architect | 架构师 | 云端 | 系统/SoC/FuSa/安全架构 | "架构设计"、"SoC架构" |
+| **Coding Yang** | RTL实现 | **本地** | RTL开发、Lint、综合 | "Coding Yang 任务:" |
+| **Verification Coding Agent** | 验证实现 | **本地** | Case开发、覆盖率、回归 | "Verification Coding Agent 任务:" |
+| **Flow Agent** | 物理实现 | **本地** | DFT、STA、PR、Signoff | "Flow Agent 任务:" |
+
+### 任务状态机
 
 ```
 ┌─────────┐    assign    ┌─────────┐    start     ┌─────────┐
@@ -805,1103 +356,166 @@ agents:
                                                    └─────────┘
 ```
 
-#### 5.2.2 任务JSON格式
+### 任务JSON协议
 
-```json
-{
-  "task_id": "TASK-AES-RTL-001",
-  "project_id": "IP_20260331_001",
-  "project_name": "AES_Crypto",
-  "task_type": "rtl_implementation",
-  "priority": "P0",
-  "status": "assigned",
-  
-  "assignment": {
-    "assigned_to": "Coding_Yang",
-    "assigned_by": "PM_Agent",
-    "assigned_date": "2026-04-02T10:00:00+08:00",
-    "deadline": "2026-04-14T18:00:00+08:00"
-  },
-  
-  "description": {
-    "title": "AES Core RTL Implementation",
-    "summary": "Implement AES core with 128/192/256-bit key support",
-    "requirements": [
-      "Support ECB, CBC, CTR, GCM, XTS modes",
-      "Implement 3-share TI S-Box",
-      "Pass all NIST test vectors"
-    ],
-    "acceptance_criteria": [
-      "Code coverage >95%",
-      "Lint clean",
-      "All directed tests pass"
-    ]
-  },
-  
-  "deliverables": {
-    "rtl_files": [
-      "Design/RTL/aes_core.v",
-      "Design/RTL/sbox_masked.v",
-      "Design/RTL/key_schedule.v"
-    ],
-    "testcases": [
-      "Verification/Testcases/directed/tc_aes_core_direct.sv"
-    ],
-    "reports": [
-      "ProjectMgmt/Tasks/Coding_Yang/TASK-AES-RTL-001_report.md"
-    ]
-  },
-  
-  "dependencies": {
-    "pre_tasks": ["TASK-AES-SPEC-001"],
-    "post_tasks": ["TASK-AES-LINT-001", "TASK-AES-TC-001"],
-    "blocks": []
-  },
-  
-  "execution": {
-    "working_directory": "sandbox/aes",
-    "commands": [
-      "make rtl",
-      "make sim TEST=tc_aes_core_direct",
-      "make coverage"
-    ],
-    "expected_duration": "8h",
-    "retry_policy": {
-      "max_attempts": 3,
-      "on_failure": "notify_pm"
-    }
-  },
-  
-  "metadata": {
-    "created_by": "PM_Agent",
-    "created_date": "2026-04-02T09:00:00+08:00",
-    "phase": "IDR",
-    "tags": ["rtl", "aes", "core"]
-  }
-}
-```
+任务描述采用标准化 JSON 格式，包含以下字段：
 
-#### 5.2.3 自动流转规则
+| 字段分组 | 关键字段 | 说明 |
+|---------|---------|------|
+| 基础信息 | `task_id`, `project_id`, `task_type`, `priority`, `status` | 任务标识与状态 |
+| 分配信息 | `assigned_to`, `assigned_by`, `deadline` | 指派与期限 |
+| 需求描述 | `title`, `requirements`, `acceptance_criteria` | 任务内容与验收标准 |
+| 交付物 | `rtl_files`, `testcases`, `reports` | 预期产出文件路径 |
+| 依赖关系 | `pre_tasks`, `post_tasks`, `blocks` | 上下游依赖 |
+| 执行信息 | `working_directory`, `commands`, `expected_duration` | 执行环境与命令 |
 
-```python
-# task_workflow.py - 任务自动流转
+**模板路径**: `project_template/ProjectMgmt/Tasks/Coding_Yang/task_template.json`
 
-class TaskWorkflow:
-    """任务状态自动流转引擎"""
-    
-    RULES = {
-        # 规则: 当前状态 → 触发条件 → 下一状态
-        "pending": {
-            "on_assign": "assigned",
-            "auto_assign": "assigned"  # 根据负载均衡自动分配
-        },
-        "assigned": {
-            "on_start": "running",
-            "on_timeout": "pending"  # 超时未开始，重新分配
-        },
-        "running": {
-            "on_submit": "reviewing",
-            "on_block": "blocked",
-            "progress_check": "running"  # 进度检查点
-        },
-        "reviewing": {
-            "on_pass": "completed",
-            "on_fail": "rejected",
-            "auto_review": "completed"  # 自动检查通过
-        },
-        "rejected": {
-            "on_rework": "running",
-            "on_reassign": "assigned"
-        },
-        "completed": {
-            "trigger_next": True  # 触发下游任务
-        }
-    }
-    
-    def transition(self, task, event):
-        """执行状态流转"""
-        current = task.status
-        if event in self.RULES[current]:
-            new_status = self.RULES[current][event]
-            self._update_status(task, new_status)
-            self._notify_agents(task, current, new_status)
-            self._execute_hooks(task, new_status)
-            return new_status
-        return None
-    
-    def _execute_hooks(self, task, new_status):
-        """执行状态钩子"""
-        if new_status == "reviewing":
-            # 自动触发质量检查
-            self.trigger_quality_check(task)
-        elif new_status == "completed":
-            # 触发下游任务
-            self.trigger_downstream_tasks(task)
-            # 更新dashboard
-            self.update_dashboard(task)
-```
+### 任务自动流转
 
-#### 5.2.4 Agent通信协议
+**模板路径**: `sandbox/tools/templates/scripts/flow/task_workflow.py`
 
-```json
-{
-  "protocol_version": "1.0",
-  "message_types": {
-    "task_assignment": {
-      "description": "任务分配",
-      "fields": ["task_id", "assignee", "description", "deliverables", "deadline"]
-    },
-    "task_status": {
-      "description": "任务状态更新",
-      "fields": ["task_id", "status", "progress", "blockers", "output_files"]
-    },
-    "review_request": {
-      "description": "评审请求",
-      "fields": ["review_type", "deliverables", "reviewer", "criteria"]
-    },
-    "review_feedback": {
-      "description": "评审反馈",
-      "fields": ["review_id", "issues", "severity", "recommendations"]
-    },
-    "milestone_achieved": {
-      "description": "里程碑达成",
-      "fields": ["milestone", "deliverables", "metrics"]
-    }
-  }
-}
-```
+流转规则：
+- `pending` → `on_assign` → `assigned`
+- `assigned` → `on_start` → `running`（超时未开始则退回 `pending`）
+- `running` → `on_submit` → `reviewing`
+- `reviewing` → `on_pass` → `completed`（触发下游任务）
+- `reviewing` → `on_fail` → `rejected` → `on_rework` → `running`
 
 ---
 
-## 6. 项目Dashboard
+## 项目Dashboard
 
-### 6.1 Dashboard架构
+### Dashboard架构
 
-```yaml
-# dashboard.yaml - Dashboard配置
+Dashboard 由 `update_dashboard.py` 自动生成，输出为 Markdown 格式存放于 `ProjectMgmt/Dashboard.md`。
 
-dashboard:
-  refresh_interval: 300  # 5分钟
-  
-  panels:
-    # 阶段进度面板
-    phase_status:
-      type: progress_bar
-      phases: [PCD, PAD, EDR, IDR, FDR, PostSilicon]
-      current: IDR
-      
-    # 任务队列面板
-    task_queue:
-      type: table
-      columns: [ID, Type, Assignee, Status, Deadline, Progress]
-      filters: [status, priority, assignee]
-      
-    # Agent状态面板
-    agent_status:
-      type: grid
-      agents: [PM_Agent, AI_Yang, Coding_Yang, Design_Agent, Verification_Agent]
-      metrics: [active_tasks, completed_today, load]
-      
-    # 质量指标面板
-    quality_metrics:
-      type: charts
-      metrics:
-        - code_coverage: [line, branch, toggle, fsm]
-        - bug_trend: [open, fixed, critical]
-        - review_pass_rate: [pass, fail, pending]
-        
-    # 警报面板
-    alerts:
-      type: list
-      severity: [critical, warning, info]
-      auto_refresh: true
-```
+**生成脚本模板路径**: `sandbox/tools/templates/scripts/flow/update_dashboard.py`
 
-### 6.2 Dashboard页面 (Markdown格式)
+**实例化输出路径**: `project/ProjectMgmt/Dashboard.md`
 
-```markdown
-# AES_Crypto - Project Dashboard
+### Dashboard面板
 
-*Last Updated: 2026-04-02 14:30:00*
+| 面板 | 类型 | 数据来源 |
+|------|------|---------|
+| Phase Status | 进度条 | `ProjectMgmt/Planning/` 阶段状态 |
+| Task Queue | 表格 | `ProjectMgmt/Tasks/` 各Agent任务清单 |
+| Agent Status | 网格 | 各Agent当前负载 |
+| Quality Metrics | 图表 | `Verification/Coverage/` 覆盖率数据 |
+| Alerts | 列表 | 任务逾期、覆盖率不达标等告警 |
 
----
-
-## 📊 Phase Status
-
-| Phase | Status | Progress | Gate Date |
-|-------|--------|----------|-----------|
-| PCD | ✅ COMPLETE | 100% | 2026-03-31 |
-| PAD | ✅ COMPLETE | 100% | 2026-03-31 |
-| EDR | ✅ COMPLETE | 100% | 2026-03-31 |
-| IDR | 🚀 IN PROGRESS | 65% | 2026-04-28 |
-| FDR | ⚪ NOT STARTED | 0% | - |
-| Post Silicon | ⚪ NOT STARTED | 0% | - |
-
----
-
-## 📝 Active Tasks
-
-| Task ID | Type | Assignee | Status | Deadline | Progress |
-|---------|------|----------|--------|----------|----------|
-| TASK-AES-RTL-001 | RTL | Coding_Yang | 🟢 Running | 04/14 | 70% |
-| TASK-AES-UVM-001 | UVM | Coding_Yang | 🟢 Running | 04/07 | 85% |
-| TASK-AES-LINT-001 | LINT | Coding_Yang | ⏳ Waiting | 04/11 | - |
-| TASK-AES-FMEDA-001 | FuSa | FuSa_Engineer | ⏳ Incoming | 04/18 | - |
-
----
-
-## 👥 Agent Status
-
-| Agent | Active Tasks | Completed Today | Load |
-|-------|-------------|-----------------|------|
-| PM_Agent | 5 | 3 | 🟢 Normal |
-| AI_Yang | 1 | 2 | 🟢 Normal |
-| Coding_Yang | 2 | 0 | 🟡 High |
-| Design_Agent | 0 | 1 | 🟢 Idle |
-| Verification_Agent | 0 | 1 | 🟢 Idle |
-
----
-
-## 📈 Quality Metrics
-
-### Code Coverage
-```
-Line:        ████████████████████░░ 92.5% (target: 90%)
-Condition:   ████████████████████░░ 91.2% (target: 90%)
-Toggle:      █████████████████░░░░░ 87.3% (target: 85%)
-FSM:         █████████████████████░ 97.8% (target: 95%)
-```
-
-### Bug Trend
-| Severity | Open | Fixed Today | Trend |
-|----------|------|-------------|-------|
-| P1 Critical | 0 | 0 | → |
-| P2 Major | 0 | 0 | → |
-| P3 Minor | 2 | 1 | ↓ |
-| P4 Trivial | 1 | 0 | → |
-
----
-
-## 🚨 Alerts
-
-| Time | Severity | Message | Agent |
-|------|----------|---------|-------|
-| 14:25 | ⚠️ Warning | TASK-AES-RTL-001 approaching deadline (3 days) | PM_Agent |
-| 14:20 | ℹ️ Info | Code coverage line metric exceeded target | AI_Yang |
-| 13:45 | ✅ Success | EDR Minor Issues remediation completed | Design_Agent |
-
----
-
-## 📅 Upcoming Milestones
-
-| Date | Milestone | Owner | Status |
-|------|-----------|-------|--------|
-| 04/07 | UVM Environment Complete | Coding_Yang | 🟡 On Track |
-| 04/14 | RTL Development Complete | Coding_Yang | 🟡 On Track |
-| 04/18 | FMEDA Analysis Complete | FuSa_Engineer | ⏳ Planned |
-| 04/28 | IDR Gate | PM_Agent | ⏳ Planned |
-
----
-
-*Dashboard auto-generated from ProjectMgmt data*
-```
-
-### 6.3 Dashboard生成脚本
-
-```python
-#!/usr/bin/env python3
-# common/update_dashboard.py - Dashboard更新脚本
-
-import json
-import os
-from datetime import datetime
-from pathlib import Path
-
-class DashboardGenerator:
-    def __init__(self, project_path):
-        self.project_path = Path(project_path)
-        self.dashboard_path = self.project_path / "ProjectMgmt" / "Dashboard.md"
-        
-    def generate(self):
-        """生成Dashboard"""
-        content = []
-        content.append(self._header())
-        content.append(self._phase_status())
-        content.append(self._active_tasks())
-        content.append(self._agent_status())
-        content.append(self._quality_metrics())
-        content.append(self._alerts())
-        content.append(self._milestones())
-        content.append(self._footer())
-        
-        with open(self.dashboard_path, 'w') as f:
-            f.write('\n'.join(content))
-    
-    def _phase_status(self):
-        """阶段状态"""
-        phases = self._load_phase_data()
-        # 生成表格...
-        return "## Phase Status\n\n..."
-    
-    def _active_tasks(self):
-        """活跃任务"""
-        tasks = self._load_task_data()
-        # 生成表格...
-        return "## Active Tasks\n\n..."
-    
-    def _quality_metrics(self):
-        """质量指标"""
-        metrics = self._collect_metrics()
-        # 生成图表...
-        return "## Quality Metrics\n\n..."
-```
-
----
-
-## 7. Review节点体系
-
-### 7.1 Review阶段定义
-
-```yaml
-# review_stages.yaml
-
-review_stages:
-  PCD:  # Project Concept Definition
-    name: "项目概念定义"
-    purpose: "确认项目可行性和商业价值"
-    
-    participants:
-      required: [PM_Agent, AI_Yang, 实体Yang]
-      optional: [System_Architect, IP_Architect]
-    
-    deliverables:
-      - MRD (市场需求文档)
-      - 可行性分析报告
-      - 资源估算
-      - 风险评估
-    
-    checklist:
-      - 市场机会明确
-      - 技术可行性确认
-      - 资源可获得
-      - 风险可控
-    
-    criteria:
-      must_have: [MRD, 可行性分析]
-      exit_condition: "所有检查项通过"
-
-  PAD:  # Product Architecture Definition
-    name: "产品架构定义"
-    purpose: "冻结架构规格，确定实现方案"
-    
-    participants:
-      required: [IP_Architect, System_Architect, AI_Yang, 实体Yang]
-      optional: [FuSa_Engineer, Security_Expert]
-    
-    deliverables:
-      - Architecture Specification
-      - Safety Concept (FuSa)
-      - Security Concept
-      - Interface Specification
-    
-    checklist:
-      - 架构满足功能需求
-      - 安全机制设计完整
-      - 功耗/面积目标可达
-      - 接口定义明确
-    
-    criteria:
-      must_have: [Architecture_Spec, Safety_Concept]
-      exit_condition: "AI Yang有条件通过或实体Yang批准"
-
-  EDR:  # Engineering Document Review
-    name: "工程设计文档评审"
-    purpose: "冻结设计文档基线"
-    
-    participants:
-      required: [Design_Agent, Verification_Agent, AI_Yang, 实体Yang]
-      optional: [DFT_Agent, Physical_Designer]
-    
-    deliverables:
-      - Design Specification
-      - Verification Plan
-      - DFT Strategy
-      - CDC/RDC Strategy
-      - Power Intent
-    
-    checklist:
-      - 8章节Design Spec完整
-      - Verification Plan覆盖所有功能点
-      - CDC策略定义
-      - 低功耗意图定义
-      - DFT可测性规划
-    
-    criteria:
-      must_have: [Design_Spec, Verification_Plan]
-      exit_condition: "实体Yang批准"
-
-  IDR:  # Implementation Design Review
-    name: "实现设计评审"
-    purpose: "确认RTL和验证完成，代码冻结"
-    
-    participants:
-      required: [Coding_Yang, AI_Yang, 实体Yang]
-      optional: [Design_Agent, Verification_Agent]
-    
-    deliverables:
-      - RTL Code (所有模块)
-      - Testbench Environment
-      - Coverage Report (>90%)
-      - Lint/CDC Clean Report
-      - FMEDA Analysis
-    
-    checklist:
-      - 所有RTL模块完成
-      - 代码覆盖率>90%
-      - Lint/CDC无错误
-      - 所有Critical/Major Bug修复
-      - FMEDA分析完成
-    
-    criteria:
-      must_have: [RTL, Coverage_Report, Lint_Report]
-      exit_condition: "所有检查项通过"
-
-  FDR:  # Final Design Review
-    name: "最终设计评审"
-    purpose: "确认物理实现完成，可Tapeout"
-    
-    participants:
-      required: [Physical_Designer, DFT_Agent, AI_Yang, 实体Yang]
-      optional: [PM_Agent]
-    
-    deliverables:
-      - GDSII
-      - STA Sign-off Report
-      - DRC/LVS Clean Report
-      - ATPG Patterns
-      - Power Analysis
-    
-    checklist:
-      - 时序收敛
-      - DRC/LVS无错误
-      - 功耗满足规格
-      - DFT覆盖率达标
-    
-    criteria:
-      must_have: [GDS, STA_Report, DRC_LVS_Report]
-      exit_condition: "所有Signoff检查通过"
-
-  PostSilicon:  # 硅后验证
-    name: "硅后验证"
-    purpose: "确认芯片功能正确，可量产"
-    
-    participants:
-      required: [Validation_Engineer, PM_Agent, 实体Yang]
-    
-    deliverables:
-      - ATE测试程序
-      - 硅后验证报告
-      - 量产测试规范
-    
-    checklist:
-      - 所有功能测试通过
-      - 良率达标
-      - 可靠性测试通过
-    
-    criteria:
-      must_have: [Validation_Report]
-      exit_condition: "量产批准"
-```
-
-### 7.2 Review Checklist模板
-
-```markdown
-# {{STAGE}} Review Checklist
-
-## 基本信息
-
-| 字段 | 值 |
-|------|-----|
-| **评审阶段** | {{STAGE}} |
-| **项目名称** | {{PROJECT_NAME}} |
-| **评审日期** | {{DATE}} |
-| **评审结果** | ☐ PASS / ☐ CONDITIONAL / ☐ FAIL |
-
-## 参与人员
-
-| 角色 | 姓名 | 签名 | 日期 |
-|------|------|------|------|
-| {{ROLE_1}} | | ☐ | |
-| {{ROLE_2}} | | ☐ | |
-| {{ROLE_3}} | | ☐ | |
-
-## 交付物检查清单
-
-| # | 交付物 | 必需 | 状态 | 位置 | 检查人 |
-|---|--------|------|------|------|--------|
-| 1 | {{DELIVERABLE_1}} | ✅ | ☐ | {{PATH_1}} | |
-| 2 | {{DELIVERABLE_2}} | ✅ | ☐ | {{PATH_2}} | |
-| 3 | {{DELIVERABLE_3}} | ⚠️ | ☐ | {{PATH_3}} | |
-
-## 质量检查
-
-| 检查项 | 标准 | 结果 | 备注 |
-|--------|------|------|------|
-| 完整性 | 所有必需交付物存在 | ☐ PASS / ☐ FAIL | |
-| 一致性 | 交付物间无矛盾 | ☐ PASS / ☐ FAIL | |
-| 可追溯性 | 需求→设计→验证链路完整 | ☐ PASS / ☐ FAIL | |
-| 质量底线 | 无明显缺陷 | ☐ PASS / ☐ FAIL | |
-| 规范性 | 符合模板要求 | ☐ PASS / ☐ FAIL | |
-
-## 问题清单
-
-| ID | 问题描述 | 严重程度 | 负责人 | 截止日期 | 状态 |
-|----|----------|----------|--------|----------|------|
-| 1 | | Critical/Major/Minor | | | Open/Fixed |
-
-## 决策记录
-
-| 决策项 | 决策 | 批准人 | 日期 |
-|--------|------|--------|------|
-| {{STAGE}} Gate | ☐ PASS / ☐ CONDITIONAL / ☐ FAIL | | |
-| 条件通过项 | | | |
-| 下一步行动 | | | |
-
-## 签名
-
-| 角色 | 签名 | 日期 |
-|------|------|------|
-| Quality Gatekeeper | ☐ | |
-| Project Manager | ☐ | |
-| 最终批准人 | ☐ | |
-```
-
-### 7.3 Review Bot 实现
-
-Review Bot 是自动化Review检查引擎，作为任务进入 REVIEWING 状态时的第一道质量关卡。
-
-#### 7.3.1 架构定位
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                      Review Bot                         │
-│                    (Auto Check Engine)                  │
-├─────────────────────────────────────────────────────────┤
-│  输入: Task状态变更 → REVIEWING                          │
-│  输出: Review Report (PASS / CONDITIONAL / FAIL)        │
-│  触发: 自动执行 + AI Yang复核 + 人工确认                  │
-└─────────────────────────────────────────────────────────┘
-```
-
-#### 7.3.2 核心实现
-
-```python
-#!/usr/bin/env python3
-# Scripts/common/review_bot.py
-
-from pathlib import Path
-from dataclasses import dataclass
-from typing import List, Dict, Optional
-import json
-import subprocess
-from datetime import datetime
-
-@dataclass
-class CheckResult:
-    check_name: str
-    passed: bool
-    message: str
-    details: Optional[Dict] = None
-    
-    def to_dict(self):
-        return {
-            "check": self.check_name,
-            "passed": self.passed,
-            "message": self.message,
-            "details": self.details
-        }
-
-class ReviewBot:
-    """自动化Review检查引擎 - 集成到任务状态机"""
-    
-    # Critical检查项列表，失败将直接导致FAIL
-    CRITICAL_CHECKS = [
-        "FileExists",
-        "CoverageCheck", 
-        "LintErrorCheck",
-        "TimingCheck",
-        "PVCheck"
-    ]
-    
-    def __init__(self, project_path: str):
-        self.project_path = Path(project_path)
-        self.report_path = self.project_path / "ProjectMgmt" / "Reviews"
-        
-    def on_task_reviewing(self, task: Dict) -> Dict:
-        """任务进入REVIEWING状态时自动触发"""
-        stage = self._detect_stage_from_task(task)
-        return self.execute_review(stage, task)
-    
-    def execute_review(self, stage: str, task: Dict) -> Dict:
-        """执行阶段检查"""
-        checks = self._get_checks_for_stage(stage)
-        results = []
-        
-        for check in checks:
-            result = check.run(self.project_path, task)
-            results.append(result)
-        
-        # 生成报告
-        report = self._generate_report(stage, task, results)
-        self._save_report(stage, report)
-        
-        # 自动决策
-        if report["all_passed"]:
-            report["recommendation"] = "PASS"
-        elif report["critical_passed"]:
-            report["recommendation"] = "CONDITIONAL"
-        else:
-            report["recommendation"] = "FAIL"
-            
-        return report
-    
-    def _get_checks_for_stage(self, stage: str) -> List:
-        """每个阶段对应的检查项"""
-        CHECKS = {
-            "PCD": [
-                FileExistsCheck("ProjectMgmt/Planning/MRD.md"),
-                FileExistsCheck("ProjectMgmt/Planning/Feasibility_Study.md"),
-                MarkdownLintCheck(),
-                SectionCheck("ProjectMgmt/Planning/MRD.md", 
-                           required=["Market Analysis", "Technical Feasibility", "Resource Estimation"]),
-            ],
-            "PAD": [
-                FileExistsCheck("Docs/Arch/Architecture_Specification.md"),
-                SectionCheck("Docs/Arch/Architecture_Specification.md", 
-                           required=["Overview", "System Architecture", "Safety Concept", "Security Architecture"]),
-                FileExistsCheck("Docs/FuSa/Safety_Concept.md"),
-                TraceabilityCheck(),
-            ],
-            "EDR": [
-                FileExistsCheck("Docs/Design/Design_Specification.md"),
-                SectionCheck("Docs/Design/Design_Specification.md",
-                           required=["Overview", "Functions", "Registers", "Block Design", "Interface", "History"]),
-                FileExistsCheck("Docs/Verification/Verification_Plan.md"),
-                FileExistsCheck("Docs/Design/SDC/synthesis.sdc"),
-                FileExistsCheck("Docs/Design/UPF/power_intent.upf"),
-                SDCCheck("Docs/Design/SDC/synthesis.sdc"),
-                UPFCheck("Docs/Design/UPF/power_intent.upf"),
-            ],
-            "IDR": [
-                RTLExistenceCheck("Design/RTL/"),
-                FilelistCheck("Design/RTL/soc/top/soc_top.f"),
-                FilelistCheck("Design/RTL/ip/uart/uart.f"),
-                CoverageCheck(min_line=90, min_toggle=85, min_fsm=95),
-                LintCheck(errors_max=0, warnings_max=10),
-                CDCCheck(),
-                BugCheck(no_critical_major=True),
-                FMEDACheck(),
-            ],
-            "FDR": [
-                FileExistsCheck("Design/GDS/top.gds"),
-                TimingCheck(setup_slack_min=0, hold_slack_min=0),
-                PVCheck(drc_clean=True, lvs_clean=True, antenna_clean=True),
-                DFTCoverageCheck(min_coverage=95),
-                PowerAnalysisCheck(),
-            ]
-        }
-        return CHECKS.get(stage, [])
-    
-    def _generate_report(self, stage: str, task: Dict, results: List[CheckResult]) -> Dict:
-        """生成Review报告"""
-        passed = [r for r in results if r.passed]
-        failed = [r for r in results if not r.passed]
-        
-        # 分类统计
-        critical_checks = [r for r in failed if any(c in r.check_name for c in self.CRITICAL_CHECKS)]
-        
-        return {
-            "stage": stage,
-            "task_id": task.get("id"),
-            "timestamp": datetime.now().isoformat(),
-            "summary": {
-                "total": len(results),
-                "passed": len(passed),
-                "failed": len(failed),
-                "critical_failed": len(critical_checks)
-            },
-            "all_passed": len(failed) == 0,
-            "critical_passed": len(critical_checks) == 0,
-            "results": [r.to_dict() for r in results],
-            "report_file": f"REVIEW_{stage}_Report.md"
-        }
-    
-    def _save_report(self, stage: str, report: Dict):
-        """保存报告到 Reviews/ 文件夹"""
-        # 生成Markdown格式报告
-        md_content = self._generate_markdown_report(stage, report)
-        report_md = self.report_path / stage / f"REVIEW_{stage}_Report.md"
-        report_md.write_text(md_content)
-        
-        # 同时保存JSON用于自动化处理
-        json_file = self.report_path / stage / f"REVIEW_{stage}_Report.json"
-        with open(json_file, 'w') as f:
-            json.dump(report, f, indent=2)
-    
-    def _generate_markdown_report(self, stage: str, report: Dict) -> str:
-        """生成Markdown格式Review报告"""
-        lines = [
-            f"# {stage} Review Report",
-            "",
-            f"**Task ID**: {report['task_id']}",
-            f"**Timestamp**: {report['timestamp']}",
-            f"**Recommendation**: {report['recommendation']}",
-            "",
-            "## Summary",
-            "",
-            f"- **Total Checks**: {report['summary']['total']}",
-            f"- **Passed**: {report['summary']['passed']} ✅",
-            f"- **Failed**: {report['summary']['failed']} ❌",
-            f"- **Critical Failed**: {report['summary']['critical_failed']}",
-            "",
-            "## Detailed Results",
-            "",
-            "| Check | Status | Message |",
-            "|-------|--------|---------|",
-        ]
-        
-        for result in report['results']:
-            status = "✅ PASS" if result['passed'] else "❌ FAIL"
-            lines.append(f"| {result['check']} | {status} | {result['message']} |")
-        
-        lines.extend([
-            "",
-            "## Sign-off",
-            "",
-            "| Role | Decision | Signature | Date |",
-            "|------|----------|-----------|------|",
-            f"| Review Bot | {report['recommendation']} | Auto | {report['timestamp'][:10]} |",
-            "| AI Yang | ☐ | | |",
-            "| 实体Yang | ☐ | | |",
-        ])
-        
-        return "\n".join(lines)
-```
-
-#### 7.3.3 检查类实现
-
-```python
-class FileExistsCheck:
-    """检查文件是否存在"""
-    def __init__(self, relative_path: str):
-        self.path = relative_path
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        full_path = project_path / self.path
-        exists = full_path.exists()
-        return CheckResult(
-            check_name=f"FileExists: {self.path}",
-            passed=exists,
-            message=f"{'Found' if exists else 'Missing'}: {self.path}",
-            details={"path": str(full_path), "exists": exists}
-        )
-
-class SectionCheck:
-    """检查文档章节完整性"""
-    def __init__(self, doc_path: str, required: List[str]):
-        self.doc_path = doc_path
-        self.required = required
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        full_path = project_path / self.doc_path
-        if not full_path.exists():
-            return CheckResult(
-                check_name=f"SectionCheck: {self.doc_path}",
-                passed=False,
-                message=f"Document not found: {self.doc_path}"
-            )
-        
-        content = full_path.read_text()
-        # 检查Markdown章节标题
-        sections_found = []
-        missing = []
-        for section in self.required:
-            # 匹配 ## Section 或 ## 1. Section 格式
-            pattern = rf"^##\s+(\d+\.\s+)?{re.escape(section)}"
-            if re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
-                sections_found.append(section)
-            else:
-                missing.append(section)
-        
-        return CheckResult(
-            check_name=f"SectionCheck: {self.doc_path}",
-            passed=len(missing) == 0,
-            message=f"Found {len(sections_found)}/{len(self.required)} sections" if missing else "All required sections present",
-            details={"required": self.required, "found": sections_found, "missing": missing}
-        )
-
-class CoverageCheck:
-    """检查代码覆盖率"""
-    def __init__(self, min_line: int = 90, min_toggle: int = 85, min_fsm: int = 95):
-        self.min_line = min_line
-        self.min_toggle = min_toggle
-        self.min_fsm = min_fsm
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        cov_db = project_path / "Verification/Coverage/coverage_report.json"
-        if not cov_db.exists():
-            return CheckResult(
-                check_name="CoverageCheck",
-                passed=False,
-                message="Coverage report not found"
-            )
-        
-        with open(cov_db) as f:
-            data = json.load(f)
-        
-        line_cov = data.get("line", 0)
-        toggle_cov = data.get("toggle", 0)
-        fsm_cov = data.get("fsm", 0)
-        
-        passed = (line_cov >= self.min_line and 
-                  toggle_cov >= self.min_toggle and 
-                  fsm_cov >= self.min_fsm)
-        
-        return CheckResult(
-            check_name="CoverageCheck",
-            passed=passed,
-            message=f"Line: {line_cov}% (target: {self.min_line}%), Toggle: {toggle_cov}% (target: {self.min_toggle}%), FSM: {fsm_cov}% (target: {self.min_fsm}%)",
-            details={"line": line_cov, "toggle": toggle_cov, "fsm": fsm_cov}
-        )
-
-class LintCheck:
-    """运行Lint检查"""
-    def __init__(self, errors_max: int = 0, warnings_max: int = 0):
-        self.errors_max = errors_max
-        self.warnings_max = warnings_max
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        result = subprocess.run(
-            ["make", "lint"],
-            cwd=project_path / "Scripts",
-            capture_output=True,
-            text=True
-        )
-        
-        # 解析lint结果
-        errors = result.stdout.count("ERROR") + result.stderr.count("ERROR")
-        warnings = result.stdout.count("WARNING") + result.stderr.count("WARNING")
-        
-        passed = errors <= self.errors_max and warnings <= self.warnings_max
-        
-        return CheckResult(
-            check_name="LintCheck",
-            passed=passed,
-            message=f"Errors: {errors} (max: {self.errors_max}), Warnings: {warnings} (max: {self.warnings_max})",
-            details={"errors": errors, "warnings": warnings, "returncode": result.returncode}
-        )
-
-class FilelistCheck:
-    """检查filelist中的文件是否都存在"""
-    def __init__(self, filelist_path: str):
-        self.filelist_path = filelist_path
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        fl_path = project_path / self.filelist_path
-        if not fl_path.exists():
-            return CheckResult(
-                check_name=f"FilelistCheck: {self.filelist_path}",
-                passed=False,
-                message=f"Filelist not found: {self.filelist_path}"
-            )
-        
-        missing_files = []
-        with open(fl_path) as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and not line.startswith('//'):
-                    file_path = project_path / line
-                    if not file_path.exists():
-                        missing_files.append(line)
-        
-        return CheckResult(
-            check_name=f"FilelistCheck: {self.filelist_path}",
-            passed=len(missing_files) == 0,
-            message=f"All files present" if not missing_files else f"Missing {len(missing_files)} files",
-            details={"filelist": self.filelist_path, "missing": missing_files}
-        )
-
-class TimingCheck:
-    """检查时序收敛"""
-    def __init__(self, setup_slack_min: float = 0, hold_slack_min: float = 0):
-        self.setup_slack_min = setup_slack_min
-        self.hold_slack_min = hold_slack_min
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        sta_report = project_path / "Design/STA/sta_signoff.rpt"
-        if not sta_report.exists():
-            return CheckResult(
-                check_name="TimingCheck",
-                passed=False,
-                message="STA report not found"
-            )
-        
-        # 解析时序报告提取slack值
-        content = sta_report.read_text()
-        setup_slack = self._extract_slack(content, "Setup")
-        hold_slack = self._extract_slack(content, "Hold")
-        
-        passed = setup_slack >= self.setup_slack_min and hold_slack >= self.hold_slack_min
-        
-        return CheckResult(
-            check_name="TimingCheck",
-            passed=passed,
-            message=f"Setup slack: {setup_slack}ns (min: {self.setup_slack_min}ns), Hold slack: {hold_slack}ns (min: {self.hold_slack_min}ns)",
-            details={"setup_slack": setup_slack, "hold_slack": hold_slack}
-        )
-    
-    def _extract_slack(self, content: str, timing_type: str) -> float:
-        # 从STA报告中提取slack值的简化实现
-        import re
-        pattern = rf"{timing_type}.*slack.*=\s*([-\d.]+)"
-        match = re.search(pattern, content, re.IGNORECASE)
-        return float(match.group(1)) if match else float('-inf')
-
-class PVCheck:
-    """物理验证检查 (DRC/LVS/Antenna)"""
-    def __init__(self, drc_clean: bool = True, lvs_clean: bool = True, antenna_clean: bool = True):
-        self.drc_clean = drc_clean
-        self.lvs_clean = lvs_clean
-        self.antenna_clean = antenna_clean
-        
-    def run(self, project_path: Path, task: Dict) -> CheckResult:
-        pv_dir = project_path / "Design/PV"
-        
-        drc_result = self._check_drc(pv_dir / "drc.rpt")
-        lvs_result = self._check_lvs(pv_dir / "lvs.rpt")
-        antenna_result = self._check_antenna(pv_dir / "antenna.rpt")
-        
-        passed = (drc_result["clean"] or not self.drc_clean) and \
-                 (lvs_result["clean"] or not self.lvs_clean) and \
-                 (antenna_result["clean"] or not self.antenna_clean)
-        
-        return CheckResult(
-            check_name="PVCheck",
-            passed=passed,
-            message=f"DRC: {'Clean' if drc_result['clean'] else f'{drc_result[\"errors\"]} errors'}, LVS: {'Clean' if lvs_result['clean'] else 'Mismatch'}, Antenna: {'Clean' if antenna_result['clean'] else 'Violations'}",
-            details={"drc": drc_result, "lvs": lvs_result, "antenna": antenna_result}
-        )
-    
-    def _check_drc(self, report_path: Path) -> Dict:
-        if not report_path.exists():
-            return {"clean": False, "errors": 0, "message": "Report not found"}
-        content = report_path.read_text()
-        errors = content.count("ERROR") + content.count("VIOLATION")
-        return {"clean": errors == 0, "errors": errors}
-    
-    def _check_lvs(self, report_path: Path) -> Dict:
-        if not report_path.exists():
-            return {"clean": False, "message": "Report not found"}
-        content = report_path.read_text()
-        return {"clean": "CORRECT" in content.upper()}
-    
-    def _check_antenna(self, report_path: Path) -> Dict:
-        if not report_path.exists():
-            return {"clean": False, "violations": 0, "message": "Report not found"}
-        content = report_path.read_text()
-        violations = content.count("VIOLATION")
-        return {"clean": violations == 0, "violations": violations}
-```
-
-#### 7.3.4 集成到任务状态机
-
-```python
-class TaskStateMachine:
-    def __init__(self, project_path: str):
-        self.review_bot = ReviewBot(project_path)
-    
-    def transition(self, task: Dict, event: str):
-        current = task.get("status")
-        
-        if event == "submit_for_review":
-            # 任务提交评审时，先运行Review Bot
-            review_report = self.review_bot.on_task_reviewing(task)
-            
-            # 保存报告到任务
-            task["review_report"] = review_report
-            
-            # 根据结果自动流转或等待人工确认
-            if review_report["recommendation"] == "PASS":
-                # 自动通过，等待AI Yang抽样检查
-                task["status"] = "reviewing"
-                self._notify_ai_yang_sample(task)
-            else:
-                # 需要人工Review
-                task["status"] = "reviewing"
-                self._notify_reviewers(task, review_report)
-                
-        elif event == "review_approve":
-            task["status"] = "completed"
-            self._trigger_downstream_tasks(task)
-            
-        elif event == "review_reject":
-            task["status"] = "rejected"
-            self._notify_assignee(task)
-    
-    def _notify_ai_yang_sample(self, task: Dict):
-        """通知AI Yang进行抽样检查"""
-        message = {
-            "type": "review_sample_request",
-            "task_id": task["id"],
-            "stage": task.get("stage"),
-            "report": task["review_report"],
-            "action_required": "抽样复核"
-        }
-        # 发送到AI Yang的消息队列
-        
-    def _notify_reviewers(self, task: Dict, report: Dict):
-        """通知评审人员进行人工Review"""
-        message = {
-            "type": "manual_review_required",
-            "task_id": task["id"],
-            "stage": task.get("stage"),
-            "report": report,
-            "issues": [r for r in report["results"] if not r["passed"]],
-            "action_required": "人工评审"
-        }
-        # 发送到相关Reviewer
-```
-
-#### 7.3.5 触发方式
-
-| 触发场景 | 命令/方式 | 执行检查 | 阻断行为 |
-|---------|-----------|---------|----------|
-| 开发者主动提交 | `make submit-review STAGE=IDR` | 指定阶段全部检查 | 失败时阻止提交 |
-| Git pre-commit hook | 自动触发 | 基础格式检查 | 失败时阻止commit |
-| CI/CD pipeline | 阶段 gate | 完整检查集 | 失败时阻断流程 |
-| PM Agent调度 | 里程碑前 | 批量阶段检查 | 生成 readiness report |
-| 定时检查 | cron job | 回归检查 | 发送告警通知 |
-
-#### 7.3.6 CLI 接口
+### Makefile集成
 
 ```bash
-# 执行指定阶段的Review检查
-python Scripts/common/review_bot.py --stage IDR --project .
-
-# 执行所有阶段的检查
-python Scripts/common/review_bot.py --all --project .
-
-# 生成报告但不保存
-python Scripts/common/review_bot.py --stage EDR --dry-run
-
-# 指定任务ID，关联到具体任务
-python Scripts/common/review_bot.py --stage FDR --task TASK-FDR-001
-
-# 仅执行特定检查
-python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageCheck"
+# 更新Dashboard
+make dashboard
+# 收集指标
+make metrics
 ```
 
-#### 7.3.7 与现有Agent的分工
+---
+
+## Review节点体系
+
+### Review阶段定义
+
+| 阶段 | 全称 | 目的 | 关键交付物 | 模板路径 |
+|------|------|------|-----------|---------|
+| PCD | Project Concept Definition | 确认项目可行性和商业价值 | MRD、可行性分析 | `templates/pm/reviews/PCD/` |
+| PAD | Product Architecture Definition | 冻结架构规格 | Architecture Spec、Safety Concept | `templates/pm/reviews/ADR_Checklist_PAD.md` |
+| EDR | Engineering Document Review | 冻结设计文档基线 | Design Spec、Verification Plan、SDC、UPF | `templates/pm/reviews/ModuleName_EDR_Checklist.md` |
+| IDR | Implementation Design Review | 确认RTL和验证完成 | RTL、Coverage Report、Lint Report | `templates/pm/reviews/ModuleName_IDR_Checklist.md` |
+| FDR | Final Design Review | 确认物理实现完成 | GDS、STA Report、DRC/LVS Report | `templates/pm/reviews/FDR_Checklist.md` |
+| PostSilicon | 硅后验证 | 确认芯片功能正确 | ATE程序、验证报告 | `templates/pm/reviews/Review_Checklist_Template.md` |
+
+### Review Checklist模板
+
+各阶段 Checklist 模板位于 `templates/pm/reviews/`，命名规范：
+- `ModuleName_EDR_Checklist.md`
+- `ModuleName_IDR_Checklist.md`
+- `FDR_Checklist.md`
+- `ADR_Checklist_PAD.md`
+- `Phase_Gate_Checklist.md`
+- `Review_Checklist_Template.md`
+
+通用 Checklist 结构包含：
+- 基本信息（阶段、项目、日期、结果）
+- 参与人员与签名
+- 交付物检查清单
+- 质量检查（完整性、一致性、可追溯性、质量底线、规范性）
+- 问题清单（ID、描述、严重程度、负责人、状态）
+- 决策记录与签名
+
+### Review Bot
+
+**模板路径**: `sandbox/tools/templates/scripts/review_bot/review_bot.py`
+
+Review Bot 是自动化检查引擎，作为任务进入 REVIEWING 状态时的第一道质量关卡。
+
+#### 架构定位
+
+```
+输入: Task状态变更 → REVIEWING
+输出: Review Report (PASS / CONDITIONAL / FAIL)
+触发: 自动执行 + AI Yang复核 + 人工确认
+```
+
+#### 各阶段检查项
+
+| 阶段 | 检查项 | 类型 |
+|------|--------|------|
+| PCD | 文件存在性、Markdown格式、必要章节 | 客观检查 |
+| PAD | 架构文档存在性、可追溯性 | 客观检查 |
+| EDR | Design Spec章节、SDC/UPF存在性 | 客观+结构检查 |
+| IDR | RTL存在性、覆盖率阈值、Lint错误、Bug状态 | 客观+数据检查 |
+| FDR | GDS存在性、时序收敛、DRC/LVS Clean | 客观+报告解析 |
+
+#### CLI接口
+
+```bash
+# 执行指定阶段检查
+python3 review_bot.py --stage IDR --project . --task TASK-ID
+
+# 执行所有阶段
+python3 review_bot.py --all --project .
+
+# 仅执行特定检查
+python3 review_bot.py --stage IDR --checks "LintCheck,CoverageCheck"
+
+# 仅生成报告，不保存
+python3 review_bot.py --stage EDR --dry-run
+```
+
+#### 集成到 Makefile
+
+```bash
+# 提交Review（自动运行Review Bot）
+make submit-review STAGE=IDR TASK=TASK-ID
+
+# 各阶段快捷命令
+make review-pcd / review-pad / review-edr / review-idr / review-fdr
+
+# Git pre-commit检查
+make pre-commit-check
+```
+
+#### 报告输出位置
+
+```
+ProjectMgmt/Reviews/
+├── PCD/
+│   ├── REVIEW_PCD_Report.md       # Review Bot生成
+│   ├── REVIEW_PCD_Report.json     # 机器可读格式
+│   ├── Meeting_Minutes_PCD.md     # 人工会议记录
+│   └── CHECKLIST_PCD.md           # 人工复核清单
+├── PAD/
+├── EDR/
+├── IDR/
+├── FDR/
+└── PostSilicon/
+```
+
+#### Review Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1924,8 +538,8 @@ python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageChec
 │                      ↓                                       │
 │  3. 实体Yang (最终决策)                                       │
 │     ├── 关键决策确认                                          │
-│     ├── 资源/ schedule 权衡                                   │
-│     └── 输出: Gate 通过 / 延期 / 驳回                        │
+│     ├── 资源/schedule权衡                                    │
+│     └── 输出: Gate通过 / 延期 / 驳回                         │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -1936,85 +550,13 @@ python Scripts/common/review_bot.py --stage IDR --checks "LintCheck,CoverageChec
 | **AI Yang** | 智能质量评估 | 1-4小时 | 抽样检查关键项 |
 | **实体Yang** | 最终批准决策 | 按需 | 战略决策 |
 
-#### 7.3.8 报告输出位置
+---
+
+## 本地Agent部署
+
+### 部署架构
 
 ```
-ProjectMgmt/Reviews/
-├── PCD/
-│   ├── REVIEW_PCD_Report.md          # Review Bot生成
-│   ├── REVIEW_PCD_Report.json        # 机器可读格式
-│   ├── Meeting_Minutes_PCD.md        # 人工会议记录
-│   └── CHECKLIST_PCD.md              # 人工复核清单
-├── PAD/
-│   ├── REVIEW_PAD_Report.md
-│   ├── REVIEW_PAD_Report.json
-│   ├── Meeting_Minutes_PAD.md
-│   └── CHECKLIST_PAD.md
-├── EDR/
-│   ├── REVIEW_EDR_Report.md
-│   ├── REVIEW_EDR_Report.json
-│   ├── Meeting_Minutes_EDR.md
-│   └── CHECKLIST_EDR.md
-├── IDR/
-│   ├── REVIEW_IDR_Report.md
-│   ├── REVIEW_IDR_Report.json
-│   ├── Meeting_Minutes_IDR.md
-│   └── CHECKLIST_IDR.md
-├── FDR/
-│   ├── REVIEW_FDR_Report.md
-│   ├── REVIEW_FDR_Report.json
-│   ├── Meeting_Minutes_FDR.md
-│   └── CHECKLIST_FDR.md
-└── PostSilicon/
-    ├── REVIEW_PostSilicon_Report.md
-    ├── REVIEW_PostSilicon_Report.json
-    ├── Meeting_Minutes_PostSilicon.md
-    └── CHECKLIST_PostSilicon.md
-```
-
-#### 7.3.9 Makefile 集成
-
-```makefile
-# Scripts/Makefile - Review Bot集成
-
-.PHONY: review review-pcd review-pad review-edr review-idr review-fdr
-
-# 通用Review提交
-submit-review:
-	@echo "Running Review Bot for stage $(STAGE)..."
-	@python3 common/review_bot.py --stage $(STAGE) --project .. --task $(TASK)
-	@if [ $$? -eq 0 ]; then \
-		echo "Review passed. Waiting for AI Yang/人工确认..."; \
-	else \
-		echo "Review failed. Please fix issues and retry."; \
-		exit 1; \
-	fi
-
-# 各阶段快捷命令
-review-pcd:
-	$(MAKE) submit-review STAGE=PCD
-
-review-pad:
-	$(MAKE) submit-review STAGE=PAD
-
-review-edr:
-	$(MAKE) submit-review STAGE=EDR
-
-review-idr:
-	$(MAKE) submit-review STAGE=IDR
-
-review-fdr:
-	$(MAKE) submit-review STAGE=FDR
-
-# 预提交检查 (Git hook调用)
-pre-commit-check:
-	@echo "Running pre-commit checks..."
-	@python3 common/review_bot.py --stage IDR --checks "LintCheck,FilelistCheck" --dry-run
-```
-
-## 8. 本地Agent部署
-
-### 8.1 部署架构
 ┌─────────────────────────────────────────────────────────────────┐
 │                        用户主机 (Linux/Mac)                      │
 │                                                                 │
@@ -2033,17 +575,6 @@ pre-commit-check:
 │  │                   │   Engine    │                        │   │
 │  │                   └─────────────┘                        │   │
 │  │                                                         │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                              │                                  │
-│                              ▼                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │                   EDA Tools Volume                       │   │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │   │
-│  │  │ Iverilog │ │ Verilator│ │  Yosys   │ │ OpenROAD │   │   │
-│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │   │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │   │
-│  │  │   VCS    │ │ DC Shell │ │  Innovus │ │  Calibre │   │   │
-│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                              │                                  │
 │                              ▼                                  │
@@ -2068,350 +599,51 @@ pre-commit-check:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 8.2 Docker部署配置
+### Docker部署
 
-```dockerfile
-# Dockerfile.coding-yang
-FROM ubuntu:22.04
+**Dockerfile模板路径**: `sandbox/tools/templates/docker/Dockerfile`
 
-# 基础工具
-RUN apt-get update && apt-get install -y \
-    git \
-    make \
-    python3 \
-    python3-pip \
-    wget \
-    curl \
-    vim \
-    && rm -rf /var/lib/apt/lists/*
+**docker-compose.yml模板路径**: `sandbox/tools/templates/docker/docker-compose.yml`
 
-# 开源EDA工具
-RUN apt-get update && apt-get install -y \
-    iverilog \
-    verilator \
-    yosys \
-    gtkwave \
-    && rm -rf /var/lib/apt/lists/*
+容器包含：
+- Ubuntu 22.04 基础环境
+- Git、Python3、websockets 等基础工具
+- 开源EDA工具（iverilog、verilator、yosys、gtkwave）
+- Agent核心代码挂载
 
-# OpenROAD (预编译二进制)
-RUN wget -q https://github.com/The-OpenROAD-Project/OpenROAD/releases/download/v2.0/openroad_2.0_amd64.deb \
-    && dpkg -i openroad_2.0_amd64.deb \
-    && rm openroad_2.0_amd64.deb
+### 本地Agent代码
 
-# Python依赖
-COPY requirements.txt /tmp/
-RUN pip3 install -r /tmp/requirements.txt
+**模板路径**: `sandbox/tools/templates/agent/agent.py`
 
-# Agent代码
-COPY agent/ /opt/coding-yang/
-WORKDIR /opt/coding-yang
+核心功能：
+- WebSocket 连接 OpenClaw Gateway
+- 自动注册并上报 EDA 工具可用性
+- 接收任务分配、执行、回传结果
+- 支持 RTL 开发、仿真、Lint、综合等任务类型
 
-# 启动脚本
-ENTRYPOINT ["python3", "agent.py"]
-```
+### 安装脚本
 
-```yaml
-# docker-compose.yml
-version: '3.8'
+**模板路径**: `sandbox/tools/templates/scripts/install_coding_yang.sh`
 
-services:
-  coding-yang:
-    build:
-      context: ./agent
-      dockerfile: Dockerfile.coding-yang
-    container_name: coding-yang-agent
-    volumes:
-      # 工作目录挂载
-      - ${WORKSPACE}:/workspace:rw
-      # EDA工具许可证
-      - ${LM_LICENSE_FILE}:/opt/licenses:ro
-      # 工具配置
-      - ./config:/opt/config:ro
-    environment:
-      - OPENCLAW_GATEWAY=${OPENCLAW_GATEWAY}
-      - AGENT_ID=coding_yang
-      - AGENT_TOKEN=${AGENT_TOKEN}
-      - WORKSPACE=/workspace
-    networks:
-      - eda_network
-    restart: unless-stopped
+安装步骤：
+1. 检查 Docker / Docker Compose 依赖
+2. 创建工作目录（默认 `$HOME/workspace`）
+3. 生成 `.env` 配置（含随机 Agent Token）
+4. 构建 Agent 容器镜像
+5. 启动容器
 
-networks:
-  eda_network:
-    driver: bridge
-```
-
-### 8.3 本地Agent代码
-
-```python
-#!/usr/bin/env python3
-# agent/agent.py - Coding Yang本地Agent
-
-import os
-import json
-import asyncio
-import websockets
-from pathlib import Path
-from datetime import datetime
-
-class CodingYangAgent:
-    """Coding Yang本地Agent"""
-    
-    def __init__(self):
-        self.agent_id = "coding_yang"
-        self.gateway_url = os.getenv("OPENCLAW_GATEWAY")
-        self.workspace = Path(os.getenv("WORKSPACE", "/workspace"))
-        self.active_tasks = {}
-        
-    async def run(self):
-        """主循环"""
-        async with websockets.connect(self.gateway_url) as ws:
-            # 注册Agent
-            await self._register(ws)
-            
-            # 监听任务
-            while True:
-                message = await ws.recv()
-                await self._handle_message(ws, json.loads(message))
-    
-    async def _register(self, ws):
-        """向Gateway注册"""
-        await ws.send(json.dumps({
-            "type": "register",
-            "agent_id": self.agent_id,
-            "capabilities": [
-                "rtl_coding",
-                "simulation",
-                "lint",
-                "synthesis",
-                "debug"
-            ],
-            "eda_tools": self._detect_eda_tools()
-        }))
-    
-    def _detect_eda_tools(self):
-        """检测可用的EDA工具"""
-        tools = []
-        
-        # 开源工具
-        if self._cmd_exists("iverilog"):
-            tools.append({"name": "iverilog", "type": "simulation", "version": self._get_version("iverilog -V")})
-        if self._cmd_exists("verilator"):
-            tools.append({"name": "verilator", "type": "simulation", "version": self._get_version("verilator --version")})
-        if self._cmd_exists("yosys"):
-            tools.append({"name": "yosys", "type": "synthesis", "version": self._get_version("yosys -V")})
-        if self._cmd_exists("openroad"):
-            tools.append({"name": "openroad", "type": "physical", "version": self._get_version("openroad -version")})
-            
-        # 商业工具 (需许可证)
-        if self._cmd_exists("vcs"):
-            tools.append({"name": "vcs", "type": "simulation", "license": "checked"})
-        if self._cmd_exists("dc_shell"):
-            tools.append({"name": "dc_shell", "type": "synthesis", "license": "checked"})
-            
-        return tools
-    
-    async def _handle_message(self, ws, message):
-        """处理消息"""
-        msg_type = message.get("type")
-        
-        if msg_type == "task_assign":
-            await self._handle_task_assign(ws, message)
-        elif msg_type == "task_cancel":
-            await self._handle_task_cancel(ws, message)
-        elif msg_type == "status_query":
-            await self._handle_status_query(ws, message)
-    
-    async def _handle_task_assign(self, ws, message):
-        """处理任务分配"""
-        task = message["task"]
-        task_id = task["task_id"]
-        
-        # 接受任务
-        self.active_tasks[task_id] = {
-            "task": task,
-            "status": "accepted",
-            "start_time": datetime.now().isoformat()
-        }
-        
-        await ws.send(json.dumps({
-            "type": "task_accepted",
-            "task_id": task_id,
-            "agent_id": self.agent_id
-        }))
-        
-        # 执行任务
-        asyncio.create_task(self._execute_task(ws, task))
-    
-    async def _execute_task(self, ws, task):
-        """执行任务"""
-        task_id = task["task_id"]
-        task_type = task["task_type"]
-        
-        try:
-            self.active_tasks[task_id]["status"] = "running"
-            
-            # 根据任务类型执行
-            if task_type == "rtl_implementation":
-                result = await self._run_rtl_task(task)
-            elif task_type == "simulation":
-                result = await self._run_simulation_task(task)
-            elif task_type == "lint":
-                result = await self._run_lint_task(task)
-            else:
-                result = {"status": "error", "message": "Unknown task type"}
-            
-            # 发送完成消息
-            await ws.send(json.dumps({
-                "type": "task_completed",
-                "task_id": task_id,
-                "result": result
-            }))
-            
-        except Exception as e:
-            await ws.send(json.dumps({
-                "type": "task_failed",
-                "task_id": task_id,
-                "error": str(e)
-            }))
-        finally:
-            del self.active_tasks[task_id]
-    
-    async def _run_rtl_task(self, task):
-        """执行RTL任务"""
-        import subprocess
-        
-        working_dir = self.workspace / task["execution"]["working_directory"]
-        commands = task["execution"]["commands"]
-        
-        results = []
-        for cmd in commands:
-            result = subprocess.run(
-                cmd,
-                shell=True,
-                cwd=working_dir,
-                capture_output=True,
-                text=True
-            )
-            results.append({
-                "command": cmd,
-                "returncode": result.returncode,
-                "stdout": result.stdout,
-                "stderr": result.stderr
-            })
-        
-        # 解析结果
-        success = all(r["returncode"] == 0 for r in results)
-        
-        return {
-            "status": "success" if success else "failure",
-            "commands": results,
-            "output_files": self._collect_outputs(task)
-        }
-    
-    def _collect_outputs(self, task):
-        """收集输出文件"""
-        outputs = []
-        for f in task["deliverables"].get("rtl_files", []):
-            path = self.workspace / f
-            if path.exists():
-                outputs.append({
-                    "file": f,
-                    "size": path.stat().st_size,
-                    "mtime": path.stat().st_mtime
-                })
-        return outputs
-    
-    def _cmd_exists(self, cmd):
-        """检查命令是否存在"""
-        return os.system(f"which {cmd} > /dev/null 2>&1") == 0
-    
-    def _get_version(self, cmd):
-        """获取工具版本"""
-        try:
-            import subprocess
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            return result.stdout.strip().split('\n')[0]
-        except:
-            return "unknown"
-
-if __name__ == "__main__":
-    agent = CodingYangAgent()
-    asyncio.run(agent.run())
-```
-
-### 8.4 部署脚本
-
+安装后常用命令：
 ```bash
-#!/bin/bash
-# install_coding_yang.sh - 安装Coding Yang本地Agent
-
-set -e
-
-echo "=========================================="
-echo "Coding Yang Agent 安装脚本"
-echo "=========================================="
-
-# 检查依赖
-echo "[1/5] 检查依赖..."
-if ! command -v docker &> /dev/null; then
-    echo "错误: Docker未安装"
-    exit 1
-fi
-
-if ! command -v docker-compose &> /dev/null; then
-    echo "错误: Docker Compose未安装"
-    exit 1
-fi
-
-# 配置
-WORKSPACE=${1:-"$HOME/workspace"}
-OPENCLAW_GATEWAY=${2:-"ws://localhost:8080/agent"}
-
-echo "[2/5] 创建工作目录..."
-mkdir -p "$WORKSPACE"
-mkdir -p "$WORKSPACE/sandbox"
-mkdir -p "$WORKSPACE/eda_tools"
-
-# 生成配置
-echo "[3/5] 生成配置..."
-cat > .env <<EOF
-WORKSPACE=$WORKSPACE
-OPENCLAW_GATEWAY=$OPENCLAW_GATEWAY
-AGENT_TOKEN=$(openssl rand -hex 32)
-LM_LICENSE_FILE=${LM_LICENSE_FILE:-""}
-EOF
-
-# 拉取/构建镜像
-echo "[4/5] 构建Agent镜像..."
-docker-compose build
-
-# 启动
-echo "[5/5] 启动Agent..."
-docker-compose up -d
-
-echo ""
-echo "=========================================="
-echo "安装完成!"
-echo "=========================================="
-echo ""
-echo "配置信息:"
-echo "  Workspace: $WORKSPACE"
-echo "  Gateway:   $OPENCLAW_GATEWAY"
-echo ""
-echo "常用命令:"
-echo "  docker-compose logs -f    # 查看日志"
-echo "  docker-compose stop       # 停止Agent"
-echo "  docker-compose start      # 启动Agent"
-echo ""
-echo "Coding Yang已就绪，等待任务分配..."
+docker-compose logs -f    # 查看日志
+docker-compose stop       # 停止Agent
+docker-compose start      # 启动Agent
 ```
 
 ---
 
-## 9. 实施路线图
+## 实施路线图
 
-### 9.1 阶段划分
+### 阶段划分
 
 ```
 Phase 1: 基础设施 (Week 1-2)
@@ -2445,7 +677,7 @@ Phase 5: 优化迭代 (Week 9+)
 └── CI/CD集成
 ```
 
-### 9.2 优先级矩阵
+### 优先级矩阵
 
 | 功能 | 影响 | 复杂度 | 优先级 | 计划 |
 |------|------|--------|--------|------|
@@ -2458,7 +690,7 @@ Phase 5: 优化迭代 (Week 9+)
 | 商业工具集成 | 中 | 高 | P2 | Week 7-8 |
 | CI/CD集成 | 低 | 高 | P3 | Week 9+ |
 
-### 9.3 成功指标
+### 成功指标
 
 | 指标 | 基线 | 目标 | 测量方式 |
 |------|------|------|----------|
@@ -2483,7 +715,35 @@ Phase 5: 优化迭代 (Week 9+)
 | DFT | - | Tessent, Modus | 商业 |
 | PV | Magic, KLayout | Calibre | 开源+商业 |
 
-### B. 参考资源
+### B. 模板路径速查表
+
+| 模板内容 | 路径 |
+|---------|------|
+| 统一Makefile | `templates/scripts/Makefile` |
+| 工具链配置 | `templates/scripts/config.mk` |
+| Iverilog仿真 | `templates/scripts/iverilog/` |
+| Verilator仿真 | `templates/scripts/verilator/` |
+| GHDL仿真 | `templates/scripts/ghdl/` |
+| Cocotb仿真 | `templates/scripts/cocotb/` |
+| Yosys综合 | `templates/scripts/yosys/yosys.mk` |
+| OpenROAD物理设计 | `templates/scripts/openroad/openroad.mk` |
+| 任务状态机 | `templates/scripts/flow/task_workflow.py` |
+| Dashboard生成 | `templates/scripts/flow/update_dashboard.py` |
+| Review Bot | `templates/scripts/review_bot/review_bot.py` |
+| Dockerfile | `templates/docker/Dockerfile` |
+| Docker Compose | `templates/docker/docker-compose.yml` |
+| Agent核心代码 | `templates/agent/agent.py` |
+| 安装脚本 | `templates/scripts/install_coding_yang.sh` |
+| 架构Spec模板 | `templates/docs/Arch/Architecture_Specification_Template.md` |
+| Design Spec模板 | `templates/docs/Module/Module_Name/ModuleName_Design_Specification_Template.md` |
+| Verification Plan模板 | `templates/docs/Module/Module_Name/ModuleName_Verification_Plan_Template.md` |
+| EDR Checklist | `templates/pm/reviews/ModuleName_EDR_Checklist.md` |
+| IDR Checklist | `templates/pm/reviews/ModuleName_IDR_Checklist.md` |
+| FDR Checklist | `templates/pm/reviews/FDR_Checklist.md` |
+| Bug记录模板 | `templates/pm/bugs/Bug_Record_Template.md` |
+| 会议记录模板 | `templates/pm/reviews/Meeting_Minutes_Template.md` |
+
+### C. 参考资源
 
 1. [OpenLANE Documentation](https://openlane.readthedocs.io/)
 2. [OpenROAD Flow](https://openroad.readthedocs.io/)
@@ -2492,6 +752,6 @@ Phase 5: 优化迭代 (Week 9+)
 
 ---
 
-*文档版本: v1.0*  
-*最后更新: 2026-04-02*  
+*文档版本: v2.0*  
+*最后更新: 2025-05-13*  
 *作者: AI Yang (Quality Gatekeeper)*
