@@ -98,7 +98,7 @@
 
 ### 项目实例化模板
 
-项目骨架由 `project_template/` 提供，通过 `install` 脚本实例化后生成如下结构：
+项目骨架通过 `install` 脚本从 `templates/` 组装生成，实例化后目录结构如下：
 
 ```
 project/
@@ -309,7 +309,7 @@ templates/
 
 ### 模板使用方式
 
-1. **项目初始化**：运行 `project_template/install`，自动填充 `{{PROJECT_NAME}}`、`{{RTL_TOP}}` 等占位符
+1. **项目初始化**：运行 `install` 脚本从 `templates/` 组装项目骨架，自动填充 `{{PROJECT_NAME}}`、`{{RTL_TOP}}` 等占位符
 2. **文档创建**：从 `templates/docs/` 复制模板到项目 `docs/` 目录，替换 `Module_Name`
 3. **脚本复用**：`templates/scripts/` 提供标准化 Makefile 和工具链脚本
 4. **Review Checklist**：从 `templates/pm/reviews/` 复制对应阶段的 Checklist
@@ -369,7 +369,7 @@ templates/
 | 依赖关系 | `pre_tasks`, `post_tasks`, `blocks` | 上下游依赖 |
 | 执行信息 | `working_directory`, `commands`, `expected_duration` | 执行环境与命令 |
 
-**模板路径**: `project_template/ProjectMgmt/Tasks/Coding_Yang/task_template.json`
+**模板路径**: `sandbox/tools/templates/pm/tasks/task_template.json`
 
 ### 任务自动流转
 

@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "task_definition": {
+    "description": "任务JSON协议模板",
+    "usage": "复制此模板并填写具体字段",
+    "naming_convention": "TASK-{PROJECT}-{TYPE}-{SEQUENCE}.json"
+  },
+  "task_id": "TASK-PROJECT-TYPE-001",
+  "project_id": "PROJECT_ID",
+  "project_name": "Project_Name",
+  "task": {
+    "type": "rtl_implementation",
+    "priority": "P0",
+    "title": "Task Title",
+    "summary": "Brief description"
+  },
+  "assignment": {
+    "assigned_to": "Coding_Yang",
+    "assigned_by": "PM_Agent",
+    "assigned_date": "2026-04-02T10:00:00+08:00",
+    "deadline": "2026-04-09T18:00:00+08:00",
+    "expected_duration": "16h",
+    "actual_duration": null
+  },
+  "status": {
+    "current": "pending",
+    "history": [
+      {"status": "pending", "timestamp": "2026-04-02T10:00:00+08:00", "note": "Task created"}
+    ],
+    "valid_transitions": {
+      "pending": ["assigned", "cancelled"],
+      "assigned": ["running", "cancelled"],
+      "running": ["submitted", "blocked"],
+      "submitted": ["reviewing"],
+      "reviewing": ["approved", "rejected"],
+      "rejected": ["running", "cancelled"],
+      "blocked": ["running", "cancelled"],
+      "cancelled": [],
+      "completed": []
+    }
+  },
+  "description": {
+    "requirements": ["Requirement 1", "Requirement 2"],
+    "acceptance_criteria": ["Criterion 1: measurable metric"],
+    "technical_specifications": {
+      "language": "Verilog-2001 / SystemVerilog",
+      "coding_standard": "Company_Coding_Standard_v2.0"
+    },
+    "constraints": {
+      "timing": "None specified",
+      "area": "None specified",
+      "power": "None specified"
+    }
+  },
+  "deliverables": {
+    "rtl_files": [{"path": "design/RTL/module_name.v", "description": "Module implementation", "required": true}],
+    "testbench_files": [{"path": "Verification/Testcases/directed/tc_test_name.sv", "description": "Test case", "required": true}],
+    "reports": [{"path": "ProjectMgmt/Tasks/TASK-PROJECT-TYPE-001_report.md", "required": true}]
+  },
+  "dependencies": {
+    "pre_tasks": [{"task_id": "TASK-PROJECT-SPEC-001", "relationship": "requires", "status": "completed"}],
+    "post_tasks": [{"task_id": "TASK-PROJECT-LINT-001", "relationship": "triggers", "auto_trigger": true}],
+    "blocks": []
+  },
+  "execution": {
+    "working_directory": "sandbox/project_name",
+    "commands": [
+      {"step": 1, "command": "make rtl", "description": "Compile RTL", "timeout": 300},
+      {"step": 2, "command": "make sim TEST=tc_smoke", "description": "Run smoke test", "timeout": 600}
+    ],
+    "retry_policy": {"max_attempts": 3, "retry_delay_seconds": 60}
+  },
+  "validation": {
+    "auto_checks": [
+      {"type": "file_exists", "files": ["design/RTL/module_name.v"]},
+      {"type": "simulation_pass", "test": "tc_smoke"},
+      {"type": "coverage_threshold", "line_coverage_min": 90, "toggle_coverage_min": 85}
+    ],
+    "manual_checks": [{"type": "code_review", "reviewer": "AI_Yang"}]
+  }
+}
