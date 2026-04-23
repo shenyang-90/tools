@@ -99,14 +99,14 @@
 
 ```
 project/
-├── ProjectMgmt/              # 项目管理 (所有与项目管理相关的文档)
-│   ├── Planning/             # 项目计划
+├── pm/              # 项目管理 (所有与项目管理相关的文档)
+│   ├── dashboard/             # 项目状态
 │   │   ├── Master_Schedule.md
 │   │   ├── Milestone_Plan.md
 │   │   ├── Resource_Plan.md
 │   │   └── Task_Assignment.md
 │   │
-│   ├── Tasks/                # Agent任务清单（按项目节点分类）
+│   ├── tasks/                # Agent任务清单（按项目节点分类）
 │   │   ├── PCD/              # Project Concept Definition
 │   │   │   ├── TASK_PCD_001_MRD.md
 │   │   │   └── TASK_PCD_002_Feasibility.md
@@ -136,7 +136,7 @@ project/
 │   │   │   └── TASK_PS_002_Validation_Report.md
 │   │   └── README.md         # 全局任务索引
 │   │
-│   ├── Reviews/              # 评审记录
+│   ├── reviews/              # 评审记录
 │   │   ├── PCD/
 │   │   │   ├── Meeting_Minutes_PCD.md      # 评审会议记录
 │   │   │   └── CHECKLIST_PCD.md
@@ -160,7 +160,7 @@ project/
 │   │       ├── Meeting_Minutes_PostSilicon.md  # 评审会议记录
 │   │       └── CHECKLIST_PostSilicon.md
 │   │
-│   ├── Bugs/                 # Bug管理
+│   ├── bugs/                 # Bug管理
 │   │   ├── P1_Critical/
 │   │   ├── P2_Major/
 │   │   ├── P3_Minor/

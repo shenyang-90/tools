@@ -17,32 +17,32 @@
 
 ### 命名格式
 ```
-[阶段]_Review_Meeting_Minutes_YYYYMMDD.md
+[阶段]_Review_YYYYMMDD.md
 ```
 
 ### 示例
 ```
-PCD_Review_Meeting_Minutes_20260327.md
-PAD_Review_Meeting_Minutes_20260615.md
-EDR_Review_Meeting_Minutes_20260901.md
-IDR_Review_Meeting_Minutes_20261220.md
-FDR_Review_Meeting_Minutes_20270315.md
-PostSilicon_Review_Meeting_Minutes_20270601.md
+PCD_Review_20260327.md
+PAD_Review_20260615.md
+EDR_Review_20260901.md
+IDR_Review_20261220.md
+FDR_Review_20270315.md
+PostSilicon_Review_20270601.md
 ```
 
 ### 模块级IDR评审
 ```
-[ModuleName]_IDR_Review_Meeting_Minutes_YYYYMMDD.md
+[ModuleName]_IDR_Review_YYYYMMDD.md
 
 例如:
-- CPU_IDR_Review_Meeting_Minutes_20260327.md
-- DMA_IDR_Review_Meeting_Minutes_20260327.md
-- USB_IDR_Review_Meeting_Minutes_20260415.md
+- CPU_IDR_Review_20260327.md
+- DMA_IDR_Review_20260327.md
+- USB_IDR_Review_20260415.md
 ```
 
 ### 存储位置
 ```
-ProjectMgmt/Reviews/[阶段]/
+pm/reviews/[阶段]/
 ```
 
 ---
@@ -51,20 +51,20 @@ ProjectMgmt/Reviews/[阶段]/
 
 ### 命名格式
 ```
-[阶段]_Checklist_[模块/类型]_v[版本]_[YYYYMMDD].md
+[模块/类型]_[阶段]_Checklist_v[版本]_[YYYYMMDD].md
 ```
 
 ### 示例
 ```
-ADR_Checklist_PAD_v1.0_20260615.md
-EDR_Checklist_CPU_v1.0_20260901.md
-IDR_Checklist_DMA_v1.0_20261220.md
-FDR_Checklist_SoC_v1.0_20270315.md
+SoC_ADR_Checklist_v1.0_20260615.md
+CPU_EDR_Checklist_v1.0_20260901.md
+DMA_IDR_Checklist_v1.0_20261220.md
+SoC_FDR_Checklist_v1.0_20270315.md
 ```
 
 ### 存储位置
 ```
-ProjectMgmt/Reviews/[阶段]/
+pm/reviews/[阶段]/
 ```
 
 ---
@@ -83,10 +83,6 @@ BUG_002_Memory_Controller_Timeout.md
 BUG_003_UART_BaudRate_Error.md
 ```
 
-### ID编号规则
-- 格式: `BUG_[YYYYMMDD]_[NNN]` 或 `BUG_[NNNN]`
-- 示例: `BUG_20260327_001` 或 `BUG_0001`
-
 ### 描述规范
 - 使用英文或拼音
 - 简洁明了（3-5个词）
@@ -95,10 +91,10 @@ BUG_003_UART_BaudRate_Error.md
 
 ### 存储位置
 ```
-ProjectMgmt/Bugs/P1_Critical/
-ProjectMgmt/Bugs/P2_Major/
-ProjectMgmt/Bugs/P3_Minor/
-ProjectMgmt/Bugs/P4_Trivial/
+pm/bugs/P1_Critical/
+pm/bugs/P2_Major/
+pm/bugs/P3_Minor/
+pm/bugs/P4_Trivial/
 ```
 
 ---
@@ -132,11 +128,10 @@ DFT_Spec_v1.0_20260901.md
 
 ### 存储位置
 ```
-Database/Docs/Design/Module_Specs/
-Database/Docs/Verification/
-Database/Docs/Arch/
-Database/Docs/FuSa/
-Database/Docs/DFT/
+docs/Module_Name/
+docs/Arch/
+docs/FuSa/
+docs/DFT/
 ```
 
 ---
@@ -167,11 +162,10 @@ uart_tx_rx.sv
 
 ### 存储位置
 ```
-Database/DesignData/RTL/
-├── top/           # 顶层模块
-├── core/          # 核心模块
-├── interface/     # 接口模块
-└── safety/        # 安全机制模块
+design/
+├── soc/           # SoC level module, Syste/Safety/Bus/IOMUX/ClockReset/Top
+├── ip/            # 独立功能模块，UART/I2C
+├── soc_top.f      # Filelist
 ```
 
 ---
@@ -212,7 +206,9 @@ cpu_ref_model.sv
 
 ### 存储位置
 ```
-Database/Verification/Env/
+verification
+├── st           # ST
+├── ut           # UT
 ```
 
 ---
@@ -247,7 +243,7 @@ err_memory_parity_001.sv
 
 ### 存储位置
 ```
-Database/Verification/Testcases/
+verification/st/tests/
 ├── directed/      # 定向测试
 ├── random/        # 随机测试
 └── vectors/       # 测试向量

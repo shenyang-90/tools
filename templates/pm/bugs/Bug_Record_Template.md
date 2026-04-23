@@ -157,4 +157,4 @@
 ---
 
 *Bug记录命名规范: BUG_[ID]_[Brief_Description].md*
-*存储位置: ProjectMgmt/Bugs/P[N]_[Priority]/*
+*存储位置: pm/bugs/P[N]_[Priority]/*
