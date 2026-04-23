@@ -98,7 +98,7 @@
 
 ### 项目实例化模板
 
-项目骨架通过 `install` 脚本从 `templates/` 组装生成，实例化后目录结构如下：
+项目骨架通过手动从 `templates/` 复制所需模板组装生成，实例化后目录结构如下：
 
 ```
 project/
@@ -153,7 +153,6 @@ project/
 │   └── README.md
 │
 ├── .gitignore
-├── install                   # 项目初始化脚本
 └── README.md
 ```
 
@@ -309,7 +308,7 @@ templates/
 
 ### 模板使用方式
 
-1. **项目初始化**：运行 `install` 脚本从 `templates/` 组装项目骨架，自动填充 `{{PROJECT_NAME}}`、`{{RTL_TOP}}` 等占位符
+1. **项目初始化**：从 `templates/` 复制所需模板到项目目录，手动填充 `{{PROJECT_NAME}}`、`{{RTL_TOP}}` 等占位符
 2. **文档创建**：从 `templates/docs/` 复制模板到项目 `docs/` 目录，替换 `Module_Name`
 3. **脚本复用**：`templates/scripts/` 提供标准化 Makefile 和工具链脚本
 4. **Review Checklist**：从 `templates/pm/reviews/` 复制对应阶段的 Checklist
