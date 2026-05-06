@@ -12,7 +12,7 @@
 
 ```bash
 cd project_template
-./install
+./install.sh [项目名称] [阶段] [工艺节点] [ASIL等级]
 ```
 
 **功能**:
@@ -20,6 +20,7 @@ cd project_template
 - ProjectMgmt: 计划、评审、Bug、会议、里程碑、风险、变更、报告
 - Database: 文档、RTL/网表/GDS、验证、固件、EDA脚本
 - Temp: EDA临时文件 (已配置 .gitignore)
+- **AGENTS.md**: Coding Yang 行为约束与项目级规则 (自动实例化)
 - 自动占位符替换 (项目名、工艺节点、ASIL等级等)
 
 **文档**: [project_template/README.md](./project_template/README.md)

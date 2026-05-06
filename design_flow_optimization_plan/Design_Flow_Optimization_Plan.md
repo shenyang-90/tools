@@ -152,6 +152,8 @@ project/
 ├── Temp/                     # 临时文件（不提交git）
 │   └── README.md
 │
+├── AGENTS.md                 # [NEW] Coding Yang 行为约束与项目级规则
+│
 ├── .gitignore
 └── README.md
 ```
@@ -163,6 +165,32 @@ project/
 | L1 | `ProjectMgmt/` | 项目级管理文档 |
 | L2 | `ProjectMgmt/Planning/` | 计划、任务、评审、Bug |
 | L3 | `ProjectMgmt/Tasks/Coding_Yang/` | Agent级任务清单 |
+
+### AGENTS.md（项目级行为约束）
+
+**模板路径**: `sandbox/tools/templates/AGENTS.md`
+
+**实例化路径**: `project/AGENTS.md`（项目根目录）
+
+**作用**: 
+- 定义 Coding Yang（kimi code CLI）在**本项目**中的强制性行为约束
+- 基于 [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) 四条原则，适配 SoC 设计工作流
+- 包含质量红线、SoC 阶段检查点、任务执行检查清单
+
+**关键机制**:
+- kimi code CLI 会自动加载项目根目录的 `AGENTS.md`（通过 `${KIMI_AGENTS_MD}` 注入 system prompt）
+- AGENTS.md 内容属于 System Context，在上下文压缩（COMPACT）时会被保留
+- 文件中包含"记忆锚点"，确保上下文压缩后 Coding Yang 仍能回忆关键原则
+
+**实例化时需替换的占位符**:
+- `{{PROJECT_NAME}}` — 项目名称
+- `{{CURRENT_PHASE}}` — 当前阶段（PAD/EDR/IDR/FDR）
+- `{{PROCESS_NODE}}` — 工艺节点（如 22nm）
+- `{{ASIL_LEVEL}}` — ASIL等级（如 ASIL-D）
+
+**与 Coding Yang 任务队列的衔接**:
+- AI Yang 在任务 JSON 的 `notes` 字段中附加规则提醒：`"执行任务前，先阅读项目根目录的 AGENTS.md 并确认遵循"`
+- Coding Yang 在回复中必须包含："我已阅读并遵循 AGENTS.md 中的全部规则"
 
 ---
 
